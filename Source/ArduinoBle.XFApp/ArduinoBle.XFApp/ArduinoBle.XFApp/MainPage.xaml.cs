@@ -192,25 +192,38 @@ namespace ArduinoBle.XFApp
                 List<IService> services = (await bleDevice.GetServicesAsync())?.ToList() ?? new List<IService>();
                 foreach (IService service in services)
                 {
-                    Debug.WriteLine($"Service name: {service.Name} - ID: {service.Id} - Is Primary? {service.IsPrimary}");
+                    Debug.WriteLine(
+                        $"Service name: {service.Name} - ID: {service.Id} - Is Primary? {service.IsPrimary}");
 
-                    foreach (ICharacteristic chx in (await service.GetCharacteristicsAsync() ?? new List<ICharacteristic>()))
+                    foreach (ICharacteristic chx in (await service.GetCharacteristicsAsync() ??
+                                                     new List<ICharacteristic>()))
                     {
-                        Debug.WriteLine($"Characteristic name: {chx.Name} - ID: {chx.Id} - Properties: {chx.Properties} - String value: {chx.StringValue} - Byte value: {GetByteString(chx.Value)}");
-                        Debug.WriteLine($"Characteristic data: {GetByteString(await chx.ReadAsync())}");
+                        Debug.WriteLine(
+                            $"Characteristic name: {chx.Name} - ID: {chx.Id} - Properties: {chx.Properties} - String value: {chx.StringValue} - Byte value: {GetByteString(chx.Value)}");
+                        if (chx.Properties.HasFlag(CharacteristicPropertyType.Read))
+                        {
+                            Debug.WriteLine($"Characteristic data: {GetByteString(await chx.ReadAsync())}");
+                        }
+
                         foreach (IDescriptor dsc in (await chx.GetDescriptorsAsync() ?? new List<IDescriptor>()))
                         {
-                            Debug.WriteLine($"Descriptor name: {dsc.Name} - ID: {dsc.Id} - Byte value: {GetByteString(dsc.Value)}");
+                            Debug.WriteLine(
+                                $"Descriptor name: {dsc.Name} - ID: {dsc.Id} - Byte value: {GetByteString(dsc.Value)}");
                             Debug.WriteLine($"Descriptor data: {GetByteString(await dsc.ReadAsync())}");
                         }
                     }
                 }
+
                 _bleDevice = bleDevice;
                 connected = true;
             }
             catch (DeviceConnectionException connectEx)
             {
                 Debug.WriteLine($"Device connection problem: {connectEx.ToString()}");
+            }
+            catch (InvalidOperationException operationEx)
+            {
+                Debug.WriteLine($"Device operation problem: {operationEx.ToString()}");
             }
             catch (Exception ex)
             {
