@@ -1,9 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/* Copyright 2018 Ellisnet - Jeremy Ellis (jeremy@ellisnet.com)
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
@@ -17,14 +29,17 @@ namespace ArduinoBle.XFApp
 	public partial class MainPage : ContentPage
 	{
 	    private static readonly string DeviceToLookFor = "Adafruit Bluefruit LE";
-	    public static readonly Guid BleCommServiceId = new Guid("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
+	    public static readonly Guid BleUartServiceId = new Guid("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 	    public static readonly Guid BleTxCharacteristicId = new Guid("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
 	    public static readonly Guid BleRxCharacteristicId = new Guid("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
+
+	    private static readonly int NotificationMilliseconds = 300;
 
         private bool _isScanning;
 	    private readonly IAdapter _adapter = CrossBluetoothLE.Current.Adapter;
 	    private IDevice _bleDevice;
 	    private bool? _hasLocationPermission;
+	    private ICharacteristic _rxCharacteristic;
 
         public MainPage()
 		{
@@ -33,6 +48,8 @@ namespace ArduinoBle.XFApp
 
 	    private async void UiScanButton_Clicked(object sender, EventArgs e)
 	    {
+	        bool connected = false;
+
 	        if (!_isScanning)
 	        {
 	            _isScanning = true;
@@ -71,7 +88,7 @@ namespace ArduinoBle.XFApp
                     _adapter.ScanTimeout = 10000; //Should be 10 seconds
 
                     await _adapter.StartScanningForDevicesAsync();
-                    await scanCompletionSource.Task;
+                    connected = await scanCompletionSource.Task;
                     if (_bleDevice == null)
                     {
                         App.ShowToast("Status: No device found.");
@@ -81,11 +98,170 @@ namespace ArduinoBle.XFApp
             };
 
             _isScanning = false;
-	        UiScanButton.IsEnabled = !_isScanning;
-	        App.ShowToast("Done scanning.");
+	        if (connected)
+	        {
+	            UiScanButton.IsVisible = false;
+            }
+	        else
+	        {
+	            UiScanButton.IsEnabled = !_isScanning;
+	            App.ShowToast("Done scanning.");
+            }        	        
         }
 
         private string GetByteString(byte[] bytes) => (bytes?.Any() ?? false) ? BitConverter.ToString(bytes) : "empty";
+
+	    private void ShowReceived(string message)
+	    {
+	        if (!String.IsNullOrWhiteSpace(message))
+	        {
+	            var toastConfig = new ToastConfig(message);
+	            toastConfig.SetPosition(ToastPosition.Bottom);
+	            toastConfig.SetDuration(NotificationMilliseconds);
+	            toastConfig.SetBackgroundColor(System.Drawing.Color.FromArgb(12, 131, 193));
+
+	            Debug.WriteLine(message);
+
+	            UserDialogs.Instance.Toast(toastConfig);
+            }
+	    }
+
+	    private string TranslateReceived(string message)
+	    {
+	        string result = "";
+
+	        message = (message ?? "").Trim().ToUpper();
+
+	        if (message.Length == 2)
+	        {
+	            switch (message[0])
+	            {
+                    case 'B':
+                        switch (message[1])
+                        {
+                            case 'G':
+                                result = "GREEN button pressed.";
+                                break;
+                            case 'B':
+                                result = "BLUE button pressed.";
+                                break;
+                            case 'R':
+                                result = "RED button pressed.";
+                                break;
+                            case 'Y':
+                                result = "YELLOW button pressed.";
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+	                case 'K':
+	                    switch (message[1])
+	                    {
+	                        case 'S':
+	                            result = "* (star) key pressed.";
+	                            break;
+                            case 'H':
+                                result = "# (hash) key pressed.";
+                                break;
+	                        case '0':
+	                            result = "0 key pressed.";
+	                            break;
+                            case '1':
+	                            result = "1 key pressed.";
+	                            break;
+	                        case '2':
+	                            result = "2 key pressed.";
+	                            break;
+	                        case '3':
+	                            result = "3 key pressed.";
+	                            break;
+	                        case '4':
+	                            result = "4 key pressed.";
+	                            break;
+	                        case '5':
+	                            result = "5 key pressed.";
+	                            break;
+	                        case '6':
+	                            result = "6 key pressed.";
+	                            break;
+	                        case '7':
+	                            result = "7 key pressed.";
+	                            break;
+	                        case '8':
+	                            result = "8 key pressed.";
+	                            break;
+	                        case '9':
+	                            result = "9 key pressed.";
+	                            break;
+                            default:
+	                            break;
+	                    }
+	                    break;
+	                case 'J':
+	                    switch (message[1])
+	                    {
+	                        case 'C':
+	                            result = "Joystick CENTERED.";
+	                            break;
+	                        case 'N':
+	                            result = "Joystick NORTH.";
+	                            break;
+	                        case 'O':
+	                            result = "Joystick NORTHEAST.";
+	                            break;
+	                        case 'E':
+	                            result = "Joystick EAST.";
+	                            break;
+	                        case 'F':
+	                            result = "Joystick SOUTHEAST.";
+	                            break;
+	                        case 'S':
+	                            result = "Joystick SOUTH.";
+	                            break;
+	                        case 'T':
+	                            result = "Joystick SOUTHWEST.";
+	                            break;
+	                        case 'W':
+	                            result = "Joystick WEST.";
+	                            break;
+	                        case 'X':
+	                            result = "Joystick NORTHWEST.";
+	                            break;
+	                        default:
+	                            break;
+	                    }
+	                    break;
+                    default:
+                        break;
+	            }
+	        }
+
+	        return result;
+	    }
+
+        private async Task<ICharacteristic> FindBleCharacteristic(Guid serviceId, Guid characteristicId, IDevice device)
+	    {
+	        ICharacteristic result = null;
+	        if (device == null) { throw new InvalidOperationException("Unable to find a characteristic when there is no BLE device."); }
+
+	        try
+	        {
+	            IService service = (await device.GetServicesAsync())?.FirstOrDefault(f => f.Id == serviceId);
+	            if (service != null)
+	            {
+	                result = (await service.GetCharacteristicsAsync())?.FirstOrDefault(f => f.Id == characteristicId);
+	            }
+	        }
+	        catch (Exception e)
+	        {
+	            Debug.WriteLine($"Error while retrieving BLE characteristic '{characteristicId}' on service '{serviceId}': {e}");
+	            Debugger.Break();
+	            throw;
+	        }
+
+	        return result;
+	    }
 
         private async Task<bool?> CheckLocationPermission(bool? hasLocationPermission)
         {
@@ -205,32 +381,30 @@ namespace ArduinoBle.XFApp
             try
             {
                 await _adapter.ConnectToDeviceAsync(bleDevice);
-                //List<IService> services = (await bleDevice.GetServicesAsync())?.ToList() ?? new List<IService>();
-                //foreach (IService service in services)
-                //{
-                //    Debug.WriteLine(
-                //        $"Service name: {service.Name} - ID: {service.Id} - Is Primary? {service.IsPrimary}");
-
-                //    foreach (ICharacteristic chx in (await service.GetCharacteristicsAsync() ??
-                //                                     new List<ICharacteristic>()))
-                //    {
-                //        Debug.WriteLine(
-                //            $"Characteristic name: {chx.Name} - ID: {chx.Id} - Properties: {chx.Properties} - String value: {chx.StringValue} - Byte value: {GetByteString(chx.Value)}");
-                //        if (chx.Properties.HasFlag(CharacteristicPropertyType.Read))
-                //        {
-                //            Debug.WriteLine($"Characteristic data: {GetByteString(await chx.ReadAsync())}");
-                //        }
-
-                //        foreach (IDescriptor dsc in (await chx.GetDescriptorsAsync() ?? new List<IDescriptor>()))
-                //        {
-                //            Debug.WriteLine(
-                //                $"Descriptor name: {dsc.Name} - ID: {dsc.Id} - Byte value: {GetByteString(dsc.Value)}");
-                //            Debug.WriteLine($"Descriptor data: {GetByteString(await dsc.ReadAsync())}");
-                //        }
-                //    }
-                //}
 
                 _bleDevice = bleDevice;
+                _rxCharacteristic = await FindBleCharacteristic(BleUartServiceId, BleRxCharacteristicId, _bleDevice);
+                if (_rxCharacteristic == null)
+                {
+                    throw new InvalidOperationException("Unable to retrieve the characteristic needed to read command responses from the BLE device.");
+                }
+                else if (!_rxCharacteristic.CanUpdate)
+                {
+                    throw new InvalidOperationException("The characteristic needed for notifications from the BLE device does not support this operation.");
+                }
+
+                _rxCharacteristic.ValueUpdated += (sender, charUpdatedEventArgs) =>
+                {
+                    byte[] receivedBytes = charUpdatedEventArgs?.Characteristic?.Value;
+                    if (receivedBytes != null && receivedBytes.Length > 0)
+                    {
+                        Debug.WriteLine($"Received bytes: {GetByteString(receivedBytes)}");
+                        ShowReceived(TranslateReceived(Encoding.ASCII.GetString(receivedBytes)));
+                    }
+                };
+
+                await _rxCharacteristic.StartUpdatesAsync();
+
                 connected = true;
             }
             catch (DeviceConnectionException connectEx)
