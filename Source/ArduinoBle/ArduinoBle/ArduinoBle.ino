@@ -10,15 +10,48 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <SPI.h>
 #include <Wire.h>
+#include <Adafruit_BLE.h>
+#include <Adafruit_BluefruitLE_UART.h>
+#include <Adafruit_BluefruitLE_SPI.h>
+//#include <Adafruit_BLEMIDI.h>
+#include <Adafruit_BLEGatt.h>
+//#include <Adafruit_BLEEddystone.h>
+//#include <Adafruit_BLEBattery.h>
+#include <Adafruit_ATParser.h>
+
+//BEGIN Adafruit BLE settings
+
+#define FACTORYRESET_ENABLE         1
+#define MINIMUM_FIRMWARE_VERSION    "0.6.6"
+#define MODE_LED_BEHAVIOUR          "MODE"
+
+// ----------------------------------------------------------------------------------------------
+// These settings are used in both SW UART, HW UART and SPI mode
+// ----------------------------------------------------------------------------------------------
+#define BUFSIZE                        128   // Size of the read buffer for incoming data
+#define VERBOSE_MODE                   true  // If set to 'true' enables debug output
+
+// SHARED SPI SETTINGS
+#define BLUEFRUIT_SPI_CS               8
+#define BLUEFRUIT_SPI_IRQ              7
+#define BLUEFRUIT_SPI_RST              4    // Optional but recommended, set to -1 if unused
+
+// SOFTWARE SPI SETTINGS
+#define BLUEFRUIT_SPI_SCK              13
+#define BLUEFRUIT_SPI_MISO             12
+#define BLUEFRUIT_SPI_MOSI             11
+
+//END Adafruit BLE settings
 
 #define JOYSTICK 0x20
 #define KEYPAD 0x4B
 
 const int ONBOARD_LED = 13;
 
-const int GREEN_BUTTON = 3;
-const int BLUE_BUTTON = 4;
+const int GREEN_BUTTON = 2;
+const int BLUE_BUTTON = 3;
 const int RED_BUTTON = 5;
 const int YELLOW_BUTTON = 6;
 
@@ -71,6 +104,12 @@ byte prev_joystick_direction = JOY_CENTER;
 boolean prev_joystick_button_state = false;
 
 boolean scan_complete = false;
+
+// A small helper
+void error(const __FlashStringHelper*err) {
+	Serial.println(err);
+	while (1);
+}
 
 //BEGIN joystick functions
 
@@ -137,12 +176,113 @@ byte getJoystickButton() {
 
 //END joystick functions
 
+//BEGIN Adafruit BLE functions
+
+//Initialize the Arduino BLE library
+// Option 1 - hardware SPI
+/* ...hardware SPI, using SCK/MOSI/MISO hardware SPI pins and then user selected CS/IRQ/RST */
+//Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
+
+//Option 2 - software SPI
+/* ...software SPI, using SCK/MOSI/MISO user-defined SPI pins and then user selected CS/IRQ/RST */
+Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
+	BLUEFRUIT_SPI_MOSI, BLUEFRUIT_SPI_CS,
+	BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
+
+/**************************************************************************/
+/*!
+@brief  Checks for user input (via the Serial Monitor)
+*/
+/**************************************************************************/
+bool getUserInput(char buffer[], uint8_t maxSize)
+{
+	// timeout in 100 milliseconds
+	TimeoutTimer timeout(100);
+
+	memset(buffer, 0, maxSize);
+	while ((!Serial.available()) && !timeout.expired()) { delay(1); }
+
+	if (timeout.expired()) return false;
+
+	delay(2);
+	uint8_t count = 0;
+	do
+	{
+		count += Serial.readBytes(buffer + count, maxSize);
+		delay(2);
+	} while ((count < maxSize) && (Serial.available()));
+
+	return true;
+}
+
+void sendBleMsg(char inputs[]) {
+	ble.print("AT+BLEUARTTX=");
+	ble.println(inputs);
+
+	// check response stastus
+	if (!ble.waitForOK()) {
+		Serial.println(F("Failed to send?"));
+	}
+}
+
+//END Adafruit BLE functions
+
 void setup() {
 	//Initialize Wire library
 	Wire.begin();
 
 	Serial.begin(115200);
 	Serial.println("Starting application...");
+
+	//BEGIN Setup code for Adafruit BLE
+	
+	/* Initialise the module */
+	Serial.print(F("Initialising the Bluefruit LE module: "));
+
+	if (!ble.begin(VERBOSE_MODE))
+	{
+		error(F("Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?"));
+	}
+	Serial.println(F("OK!"));
+
+	if (FACTORYRESET_ENABLE)
+	{
+		/* Perform a factory reset to make sure everything is in a known state */
+		Serial.println(F("Performing a factory reset: "));
+		if (!ble.factoryReset()) {
+			error(F("Couldn't factory reset"));
+		}
+	}
+
+	/* Disable command echo from Bluefruit */
+	ble.echo(false);
+
+	Serial.println("Requesting Bluefruit info:");
+	/* Print Bluefruit information */
+	ble.info();
+
+	//Serial.println(F("Please use Adafruit Bluefruit LE app to connect in UART mode"));
+	//Serial.println(F("Then Enter characters to send to Bluefruit"));
+	//Serial.println();
+
+	ble.verbose(false);  // debug info is a little annoying after this point!
+
+						 /* Wait for connection */
+	while (!ble.isConnected()) {
+		delay(500);
+	}
+
+	// LED Activity command is only supported from 0.6.6
+	if (ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION))
+	{
+		// Change Mode LED Activity
+		Serial.println(F("******************************"));
+		Serial.println(F("Change LED activity to " MODE_LED_BEHAVIOUR));
+		ble.sendCommandCheckOK("AT+HWModeLED=" MODE_LED_BEHAVIOUR);
+		Serial.println(F("******************************"));
+	}
+
+	//END Setup code for Adafruit BLE
 
 	// initialize digital pin 13 as an output.
 	pinMode(ONBOARD_LED, OUTPUT);
@@ -207,39 +347,51 @@ void loop() {
 	{
 	case KEY_STAR:
 		Serial.println("KEY * pressed.");
+		sendBleMsg("KS");
 		break;
 	case KEY_HASH:
 		Serial.println("KEY # pressed.");
+		sendBleMsg("KH");
 		break;
 	case KEY_0:
 		Serial.println("KEY 0 pressed.");
+		sendBleMsg("K0");
 		break;
 	case KEY_1:
 		Serial.println("KEY 1 pressed.");
+		sendBleMsg("K1");
 		break;
 	case KEY_2:
 		Serial.println("KEY 2 pressed.");
+		sendBleMsg("K2");
 		break;
 	case KEY_3:
 		Serial.println("KEY 3 pressed.");
+		sendBleMsg("K3");
 		break;
 	case KEY_4:
 		Serial.println("KEY 4 pressed.");
+		sendBleMsg("K4");
 		break;
 	case KEY_5:
 		Serial.println("KEY 5 pressed.");
+		sendBleMsg("K5");
 		break;
 	case KEY_6:
 		Serial.println("KEY 6 pressed.");
+		sendBleMsg("K6");
 		break;
 	case KEY_7:
 		Serial.println("KEY 7 pressed.");
+		sendBleMsg("K7");
 		break;
 	case KEY_8:
 		Serial.println("KEY 8 pressed.");
+		sendBleMsg("K8");
 		break;
 	case KEY_9:
 		Serial.println("KEY 9 pressed.");
+		sendBleMsg("K9");
 		break;
 	default:
 		break;
@@ -305,30 +457,39 @@ void loop() {
 	if (joystick_direction != prev_joystick_direction) {
 		if (joystick_direction == JOY_CENTER) {
 			Serial.println("JOYSTICK is CENTERED.");
+			sendBleMsg("JC");
 		}
 		else if (joystick_direction == JOY_N) {
 			Serial.println("JOYSTICK is NORTH.");
+			sendBleMsg("JN");
 		}
 		else if (joystick_direction == JOY_NE) {
 			Serial.println("JOYSTICK is NORTHEAST.");
+			sendBleMsg("JO");
 		}
 		else if (joystick_direction == JOY_E) {
 			Serial.println("JOYSTICK is EAST.");
+			sendBleMsg("JE");
 		}
 		else if (joystick_direction == JOY_SE) {
 			Serial.println("JOYSTICK is SOUTHEAST.");
+			sendBleMsg("JF");
 		}
 		else if (joystick_direction == JOY_S) {
 			Serial.println("JOYSTICK is SOUTH.");
+			sendBleMsg("JS");
 		}
 		else if (joystick_direction == JOY_SW) {
 			Serial.println("JOYSTICK is SOUTHWEST.");
+			sendBleMsg("JT");
 		}
 		else if (joystick_direction == JOY_W) {
 			Serial.println("JOYSTICK is WEST.");
+			sendBleMsg("JW");
 		}
 		else if (joystick_direction == JOY_NW) {
 			Serial.println("JOYSTICK is NORTHWEST.");
+			sendBleMsg("JX");
 		}
 
 		prev_joystick_direction = joystick_direction;
@@ -342,6 +503,7 @@ void loop() {
 	if (green_button_state != prev_green_button_state) {
 		if (green_button_state == HIGH) {
 			Serial.println("GREEN button pressed.");
+			sendBleMsg("BG");
 		}
 		prev_green_button_state = green_button_state;
 	}
@@ -349,6 +511,7 @@ void loop() {
 	if (blue_button_state != prev_blue_button_state) {
 		if (blue_button_state == HIGH) {
 			Serial.println("BLUE button pressed.");
+			sendBleMsg("BB");
 		}
 		prev_blue_button_state = blue_button_state;
 	}
@@ -356,6 +519,7 @@ void loop() {
 	if (red_button_state != prev_red_button_state) {
 		if (red_button_state == HIGH) {
 			Serial.println("RED button pressed.");
+			sendBleMsg("BR");
 		}
 		prev_red_button_state = red_button_state;
 	}
@@ -363,9 +527,33 @@ void loop() {
 	if (yellow_button_state != prev_yellow_button_state) {
 		if (yellow_button_state == HIGH) {
 			Serial.println("YELLOW button pressed.");
+			sendBleMsg("BY");
 		}
 		prev_yellow_button_state = yellow_button_state;
 	}
+
+/*
+	// Check for user input
+	char inputs[BUFSIZE + 1];
+
+	if (getUserInput(inputs, BUFSIZE))
+	{
+		// Send characters to Bluefruit
+		Serial.print("[Send] ");
+		Serial.println(inputs);
+
+		sendBleMsg(inputs);
+	}
+
+	// Check for incoming characters from Bluefruit
+	ble.println("AT+BLEUARTRX");
+	ble.readline();
+	if (!(strcmp(ble.buffer, "OK") == 0)) {
+		// Some data was found, its in the buffer
+		Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
+		ble.waitForOK();
+	}
+*/
 
 	delay(CYCLE_MILLISECONDS); //loop delay
 }

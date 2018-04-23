@@ -18,7 +18,9 @@ namespace ArduinoBle.XFApp
 	        toastConfig.SetDuration(2000);
 	        toastConfig.SetBackgroundColor(System.Drawing.Color.FromArgb(12, 131, 193));
 
-	        UserDialogs.Instance.Toast(toastConfig);
+	        Debug.WriteLine(toastMsg);
+
+            UserDialogs.Instance.Toast(toastConfig);
 	    }
 
         public App ()

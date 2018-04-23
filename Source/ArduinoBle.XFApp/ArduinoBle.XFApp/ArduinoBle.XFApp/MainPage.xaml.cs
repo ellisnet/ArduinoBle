@@ -16,8 +16,12 @@ namespace ArduinoBle.XFApp
 {
 	public partial class MainPage : ContentPage
 	{
-	    private static readonly string deviceToLookFor = "Adafruit Bluefruit LE A956";
-	    private bool _isScanning;
+	    private static readonly string DeviceToLookFor = "Adafruit Bluefruit LE";
+	    public static readonly Guid BleCommServiceId = new Guid("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
+	    public static readonly Guid BleTxCharacteristicId = new Guid("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
+	    public static readonly Guid BleRxCharacteristicId = new Guid("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
+
+        private bool _isScanning;
 	    private readonly IAdapter _adapter = CrossBluetoothLE.Current.Adapter;
 	    private IDevice _bleDevice;
 	    private bool? _hasLocationPermission;
@@ -40,33 +44,45 @@ namespace ArduinoBle.XFApp
                 if (_hasLocationPermission.GetValueOrDefault(false))
                 {
                     _bleDevice = null;
+                    var scanCompletionSource = new TaskCompletionSource<bool>();
+
                     _adapter.DeviceDiscovered += async (o, eventArgs) =>
                     {
-                        if (!String.IsNullOrWhiteSpace(eventArgs.Device.Name) && eventArgs.Device.Name.Contains(deviceToLookFor))
+                        if (!String.IsNullOrWhiteSpace(eventArgs.Device.Name) && eventArgs.Device.Name.Contains(DeviceToLookFor))
                         {
-                            App.ShowToast($"Bluetooth LE device found: {eventArgs.Device.Name}");
+                            Debug.WriteLine($"Bluetooth LE device found: {eventArgs.Device.Name}");
                             if (await RegisterBleDevice(eventArgs.Device))
                             {
                                 App.ShowToast("Status: Device successfully connected!");
                                 await _adapter.StopScanningForDevicesAsync();
+                                await Task.Delay(3000);
+                                scanCompletionSource.SetResult(true);
                             }
                         }
                     };
+
+                    _adapter.ScanTimeoutElapsed += (o, args) =>
+                    {
+                        Debug.WriteLine("Scan timed out.");
+                        scanCompletionSource.SetResult(false);
+                    };
+
                     _adapter.ScanMode = ScanMode.Balanced;
                     _adapter.ScanTimeout = 10000; //Should be 10 seconds
 
                     await _adapter.StartScanningForDevicesAsync();
-                    await Task.Delay(TimeSpan.FromSeconds(30));
+                    await scanCompletionSource.Task;
                     if (_bleDevice == null)
                     {
                         App.ShowToast("Status: No device found.");
+                        await Task.Delay(5000);
                     }
                 }
             };
 
             _isScanning = false;
-	            UiScanButton.IsEnabled = !_isScanning;
-	            App.ShowToast("Done scanning.");
+	        UiScanButton.IsEnabled = !_isScanning;
+	        App.ShowToast("Done scanning.");
         }
 
         private string GetByteString(byte[] bytes) => (bytes?.Any() ?? false) ? BitConverter.ToString(bytes) : "empty";
@@ -189,30 +205,30 @@ namespace ArduinoBle.XFApp
             try
             {
                 await _adapter.ConnectToDeviceAsync(bleDevice);
-                List<IService> services = (await bleDevice.GetServicesAsync())?.ToList() ?? new List<IService>();
-                foreach (IService service in services)
-                {
-                    Debug.WriteLine(
-                        $"Service name: {service.Name} - ID: {service.Id} - Is Primary? {service.IsPrimary}");
+                //List<IService> services = (await bleDevice.GetServicesAsync())?.ToList() ?? new List<IService>();
+                //foreach (IService service in services)
+                //{
+                //    Debug.WriteLine(
+                //        $"Service name: {service.Name} - ID: {service.Id} - Is Primary? {service.IsPrimary}");
 
-                    foreach (ICharacteristic chx in (await service.GetCharacteristicsAsync() ??
-                                                     new List<ICharacteristic>()))
-                    {
-                        Debug.WriteLine(
-                            $"Characteristic name: {chx.Name} - ID: {chx.Id} - Properties: {chx.Properties} - String value: {chx.StringValue} - Byte value: {GetByteString(chx.Value)}");
-                        if (chx.Properties.HasFlag(CharacteristicPropertyType.Read))
-                        {
-                            Debug.WriteLine($"Characteristic data: {GetByteString(await chx.ReadAsync())}");
-                        }
+                //    foreach (ICharacteristic chx in (await service.GetCharacteristicsAsync() ??
+                //                                     new List<ICharacteristic>()))
+                //    {
+                //        Debug.WriteLine(
+                //            $"Characteristic name: {chx.Name} - ID: {chx.Id} - Properties: {chx.Properties} - String value: {chx.StringValue} - Byte value: {GetByteString(chx.Value)}");
+                //        if (chx.Properties.HasFlag(CharacteristicPropertyType.Read))
+                //        {
+                //            Debug.WriteLine($"Characteristic data: {GetByteString(await chx.ReadAsync())}");
+                //        }
 
-                        foreach (IDescriptor dsc in (await chx.GetDescriptorsAsync() ?? new List<IDescriptor>()))
-                        {
-                            Debug.WriteLine(
-                                $"Descriptor name: {dsc.Name} - ID: {dsc.Id} - Byte value: {GetByteString(dsc.Value)}");
-                            Debug.WriteLine($"Descriptor data: {GetByteString(await dsc.ReadAsync())}");
-                        }
-                    }
-                }
+                //        foreach (IDescriptor dsc in (await chx.GetDescriptorsAsync() ?? new List<IDescriptor>()))
+                //        {
+                //            Debug.WriteLine(
+                //                $"Descriptor name: {dsc.Name} - ID: {dsc.Id} - Byte value: {GetByteString(dsc.Value)}");
+                //            Debug.WriteLine($"Descriptor data: {GetByteString(await dsc.ReadAsync())}");
+                //        }
+                //    }
+                //}
 
                 _bleDevice = bleDevice;
                 connected = true;
