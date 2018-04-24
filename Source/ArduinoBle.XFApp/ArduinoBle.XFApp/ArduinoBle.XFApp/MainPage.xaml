@@ -4,9 +4,73 @@
              xmlns:local="clr-namespace:ArduinoBle.XFApp"
              x:Class="ArduinoBle.XFApp.MainPage">
 
-    <StackLayout Orientation="Vertical" VerticalOptions="Center">
-        <Label Text="Welcome to Xamarin.Forms!" HorizontalOptions="Center" />
-        <Button x:Name="UiScanButton" Text="Scan for BLE devices" Clicked="UiScanButton_Clicked" />
-    </StackLayout>
+    <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+        <StackLayout x:Name="UiScanButtonContainer" Grid.Row="0" Grid.Column="0"  
+                     Orientation="Vertical" VerticalOptions="Center">
+            <Button x:Name="UiScanButton" Text="Scan for BLE devices" Clicked="UiScanButton_Clicked" />
+        </StackLayout>
+
+        <Grid x:Name="UiButtonsContainer" Grid.Row="0" Grid.Column="0" Margin="20" IsVisible="False"
+              HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--Top colored buttons-->
+            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="UiButtonGreen" Text="F1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+                <Button Grid.Column="1" x:Name="UiButtonBlue" Text="F2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+                <Button Grid.Column="2" x:Name="UiButtonRed" Text="F3" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+                <Button Grid.Column="3" x:Name="UiButtonYellow" Text="F4" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+            </Grid>
+            
+            <!--Select buttons-->
+            <Button x:Name="UiButtonUp" Text="Up" Grid.Row="1" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <Button x:Name="UiButtonLeft" Text="Left" Grid.Row="2" Grid.Column="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiButtonCenter" Text="Select" Grid.Row="2" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiButtonRight" Text="Right" Grid.Row="2" Grid.Column="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <Button x:Name="UiButtonDown" Text="Down" Grid.Row="3" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <!--Keypad buttons-->
+            <Button x:Name="UiKey1" Text="1" Grid.Row="4" Grid.Column="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey2" Text="2" Grid.Row="4" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey3" Text="3" Grid.Row="4" Grid.Column="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <Button x:Name="UiKey4" Text="4" Grid.Row="5" Grid.Column="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey5" Text="5" Grid.Row="5" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey6" Text="6" Grid.Row="5" Grid.Column="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <Button x:Name="UiKey7" Text="7" Grid.Row="6" Grid.Column="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey8" Text="8" Grid.Row="6" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey9" Text="9" Grid.Row="6" Grid.Column="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+            <Button x:Name="UiKeyStar" Text="*" Grid.Row="7" Grid.Column="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKey0" Text="0" Grid.Row="7" Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+            <Button x:Name="UiKeyHash" Text="#" Grid.Row="7" Grid.Column="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ></Button>
+
+        </Grid>
+        
+    </Grid>
 
 </ContentPage>

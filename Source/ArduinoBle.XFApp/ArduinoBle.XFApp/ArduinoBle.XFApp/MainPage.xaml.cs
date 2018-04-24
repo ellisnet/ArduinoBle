@@ -34,6 +34,8 @@ namespace ArduinoBle.XFApp
 	    public static readonly Guid BleRxCharacteristicId = new Guid("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
 
 	    private static readonly int NotificationMilliseconds = 300;
+	    private static readonly Color DefaultButtonColor = Color.Silver;
+	    private static readonly int ButtonSelectMilliseconds = 400;
 
         private bool _isScanning;
 	    private readonly IAdapter _adapter = CrossBluetoothLE.Current.Adapter;
@@ -100,8 +102,10 @@ namespace ArduinoBle.XFApp
             _isScanning = false;
 	        if (connected)
 	        {
-	            UiScanButton.IsVisible = false;
-            }
+	            UiScanButtonContainer.IsVisible = false;
+	            UiButtonsContainer.IsVisible = true;
+                ResetButtonColors(DefaultButtonColor, true);
+	        }
 	        else
 	        {
 	            UiScanButton.IsEnabled = !_isScanning;
@@ -126,7 +130,42 @@ namespace ArduinoBle.XFApp
             }
 	    }
 
-	    private string TranslateReceived(string message)
+	    private void ResetSelectColors(Color color)
+	    {
+	        UiButtonUp.BackgroundColor = color;
+	        UiButtonLeft.BackgroundColor = color;
+	        UiButtonRight.BackgroundColor = color;
+	        UiButtonDown.BackgroundColor = color;
+        }
+
+	    private void ResetButtonColors(Color color, bool withSelect)
+	    {
+	        UiButtonGreen.BackgroundColor = color;
+	        UiButtonBlue.BackgroundColor = color;
+	        UiButtonRed.BackgroundColor = color;
+	        UiButtonYellow.BackgroundColor = color;
+
+	        UiButtonCenter.BackgroundColor = color;
+	        if (withSelect)
+	        {
+	            ResetSelectColors(color);
+	        }
+
+	        UiKey0.BackgroundColor = color;
+	        UiKey1.BackgroundColor = color;
+	        UiKey2.BackgroundColor = color;
+	        UiKey3.BackgroundColor = color;
+	        UiKey4.BackgroundColor = color;
+	        UiKey5.BackgroundColor = color;
+	        UiKey6.BackgroundColor = color;
+	        UiKey7.BackgroundColor = color;
+	        UiKey8.BackgroundColor = color;
+	        UiKey9.BackgroundColor = color;
+	        UiKeyStar.BackgroundColor = color;
+	        UiKeyHash.BackgroundColor = color;
+        }
+
+        private string TranslateReceived(string message)
 	    {
 	        string result = "";
 
@@ -134,21 +173,39 @@ namespace ArduinoBle.XFApp
 
 	        if (message.Length == 2)
 	        {
+                //ResetButtonColors(DefaultButtonColor, false);
+
 	            switch (message[0])
 	            {
                     case 'B':
                         switch (message[1])
                         {
                             case 'G':
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiButtonGreen.BackgroundColor = Color.Green;
+                                });                               
                                 result = "GREEN button pressed.";
                                 break;
                             case 'B':
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiButtonBlue.BackgroundColor = Color.Blue;
+                                });
                                 result = "BLUE button pressed.";
                                 break;
                             case 'R':
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiButtonRed.BackgroundColor = Color.Red;
+                                });
                                 result = "RED button pressed.";
                                 break;
                             case 'Y':
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiButtonYellow.BackgroundColor = Color.Yellow;
+                                });
                                 result = "YELLOW button pressed.";
                                 break;
                             default:
@@ -159,40 +216,88 @@ namespace ArduinoBle.XFApp
 	                    switch (message[1])
 	                    {
 	                        case 'S':
-	                            result = "* (star) key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKeyStar.BackgroundColor = Color.Blue;
+                                });
+                                result = "* (star) key pressed.";
 	                            break;
                             case 'H':
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiKeyHash.BackgroundColor = Color.Blue;
+                                });
                                 result = "# (hash) key pressed.";
                                 break;
 	                        case '0':
-	                            result = "0 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey0.BackgroundColor = Color.Blue;
+	                            });
+                                result = "0 key pressed.";
 	                            break;
                             case '1':
-	                            result = "1 key pressed.";
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    UiKey1.BackgroundColor = Color.Blue;
+                                });
+                                result = "1 key pressed.";
 	                            break;
 	                        case '2':
-	                            result = "2 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey2.BackgroundColor = Color.Blue;
+	                            });
+                                result = "2 key pressed.";
 	                            break;
 	                        case '3':
-	                            result = "3 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey3.BackgroundColor = Color.Blue;
+	                            });
+                                result = "3 key pressed.";
 	                            break;
 	                        case '4':
-	                            result = "4 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey4.BackgroundColor = Color.Blue;
+	                            });
+                                result = "4 key pressed.";
 	                            break;
 	                        case '5':
-	                            result = "5 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey5.BackgroundColor = Color.Blue;
+	                            });
+                                result = "5 key pressed.";
 	                            break;
 	                        case '6':
-	                            result = "6 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey6.BackgroundColor = Color.Blue;
+	                            });
+                                result = "6 key pressed.";
 	                            break;
 	                        case '7':
-	                            result = "7 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey7.BackgroundColor = Color.Blue;
+	                            });
+                                result = "7 key pressed.";
 	                            break;
 	                        case '8':
-	                            result = "8 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey8.BackgroundColor = Color.Blue;
+	                            });
+                                result = "8 key pressed.";
 	                            break;
 	                        case '9':
-	                            result = "9 key pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiKey9.BackgroundColor = Color.Blue;
+	                            });
+                                result = "9 key pressed.";
 	                            break;
                             default:
 	                            break;
@@ -202,7 +307,11 @@ namespace ArduinoBle.XFApp
 	                    switch (message[1])
 	                    {
 	                        case 'B':
-	                            result = "Joystick BUTTON pressed.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                UiButtonCenter.BackgroundColor = Color.Green;
+	                            });
+                                result = "Joystick BUTTON pressed.";
 	                            break;
                             case 'C':
 	                            result = "Joystick CENTERED.";
@@ -238,6 +347,15 @@ namespace ArduinoBle.XFApp
                     default:
                         break;
 	            }
+
+	            Task.Run(async () =>
+	            {
+	                await Task.Delay(ButtonSelectMilliseconds);
+	                Device.BeginInvokeOnMainThread(() =>
+	                {
+	                    ResetButtonColors(DefaultButtonColor, false);
+                    });                    
+	            });
 	        }
 
 	        return result;
@@ -402,7 +520,8 @@ namespace ArduinoBle.XFApp
                     if (receivedBytes != null && receivedBytes.Length > 0)
                     {
                         Debug.WriteLine($"Received bytes: {GetByteString(receivedBytes)}");
-                        ShowReceived(TranslateReceived(Encoding.ASCII.GetString(receivedBytes)));
+                        string translated = TranslateReceived(Encoding.ASCII.GetString(receivedBytes));
+                        //ShowReceived(translated);
                     }
                 };
 
