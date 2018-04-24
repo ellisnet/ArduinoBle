@@ -201,7 +201,10 @@ namespace ArduinoBle.XFApp
 	                case 'J':
 	                    switch (message[1])
 	                    {
-	                        case 'C':
+	                        case 'B':
+	                            result = "Joystick BUTTON pressed.";
+	                            break;
+                            case 'C':
 	                            result = "Joystick CENTERED.";
 	                            break;
 	                        case 'N':

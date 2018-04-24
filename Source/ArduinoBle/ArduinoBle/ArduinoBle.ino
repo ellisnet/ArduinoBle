@@ -88,7 +88,7 @@ const byte JOY_DOWN = 0x03;
 
 const byte JOY_BUTTON_DOWN = 0x00;
 
-const int CYCLE_MILLISECONDS = 100;
+const int CYCLE_MILLISECONDS = 40;
 
 int green_button_state = LOW;
 int blue_button_state = LOW;
@@ -400,6 +400,7 @@ void loop() {
 	if (getJoystickButton() == JOY_BUTTON_DOWN) {
 		if (!prev_joystick_button_state) {
 			Serial.println("JOYSTICK button pressed.");
+			sendBleMsg("JB");
 		}
 		prev_joystick_button_state = true;
 	}
