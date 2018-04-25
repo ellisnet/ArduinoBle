@@ -35,7 +35,7 @@ namespace ArduinoBle.XFApp
 
 	    private static readonly int NotificationMilliseconds = 300;
 	    private static readonly Color DefaultButtonColor = Color.Silver;
-	    private static readonly int ButtonSelectMilliseconds = 400;
+	    private static readonly int ButtonSelectMilliseconds = 300;
 
         private bool _isScanning;
 	    private readonly IAdapter _adapter = CrossBluetoothLE.Current.Adapter;
@@ -314,28 +314,52 @@ namespace ArduinoBle.XFApp
                                 result = "Joystick BUTTON pressed.";
 	                            break;
                             case 'C':
-	                            result = "Joystick CENTERED.";
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    ResetSelectColors(DefaultButtonColor);
+                                });
+                                result = "Joystick CENTERED.";
 	                            break;
 	                        case 'N':
-	                            result = "Joystick NORTH.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                ResetSelectColors(DefaultButtonColor);
+	                                UiButtonUp.BackgroundColor = Color.Blue;
+                                });
+                                result = "Joystick NORTH.";
 	                            break;
 	                        case 'O':
 	                            result = "Joystick NORTHEAST.";
 	                            break;
 	                        case 'E':
-	                            result = "Joystick EAST.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                ResetSelectColors(DefaultButtonColor);
+	                                UiButtonRight.BackgroundColor = Color.Blue;
+	                            });
+                                result = "Joystick EAST.";
 	                            break;
 	                        case 'F':
 	                            result = "Joystick SOUTHEAST.";
 	                            break;
 	                        case 'S':
-	                            result = "Joystick SOUTH.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                ResetSelectColors(DefaultButtonColor);
+	                                UiButtonDown.BackgroundColor = Color.Blue;
+	                            });
+                                result = "Joystick SOUTH.";
 	                            break;
 	                        case 'T':
 	                            result = "Joystick SOUTHWEST.";
 	                            break;
 	                        case 'W':
-	                            result = "Joystick WEST.";
+	                            Device.BeginInvokeOnMainThread(() =>
+	                            {
+	                                ResetSelectColors(DefaultButtonColor);
+	                                UiButtonLeft.BackgroundColor = Color.Blue;
+	                            });
+                                result = "Joystick WEST.";
 	                            break;
 	                        case 'X':
 	                            result = "Joystick NORTHWEST.";
@@ -521,6 +545,7 @@ namespace ArduinoBle.XFApp
                     {
                         Debug.WriteLine($"Received bytes: {GetByteString(receivedBytes)}");
                         string translated = TranslateReceived(Encoding.ASCII.GetString(receivedBytes));
+                        Debug.WriteLine(translated);
                         //ShowReceived(translated);
                     }
                 };
