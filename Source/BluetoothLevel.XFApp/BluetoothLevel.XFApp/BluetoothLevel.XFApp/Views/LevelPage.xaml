@@ -26,7 +26,13 @@
                 <Button Grid.Column="1" Text="Measure Level" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                         Command="{Binding RequestMeasurementCommand}"></Button>
             </Grid>
-            
+
+            <BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="{Binding LevelBorderColor}"
+                     HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></BoxView>
+
+            <BoxView Grid.Row="1" Grid.Column="1" Margin="3" BackgroundColor="White"
+                     HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></BoxView>
+
         </Grid>
     </ContentPage.Content>
 </ContentPage>

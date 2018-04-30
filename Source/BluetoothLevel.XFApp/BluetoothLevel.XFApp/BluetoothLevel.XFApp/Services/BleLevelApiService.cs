@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using BluetoothLevel.XFApp.Models;
+using BluetoothLevel.XFApp.Observables;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
@@ -34,6 +34,9 @@ namespace BluetoothLevel.XFApp.Services
         private bool? _hasLocationPermission;
         private ICharacteristic _rxCharacteristic;
         private ICharacteristic _txCharacteristic;
+        private MeasurementObservable _measurementNotifier;
+
+        private Action DisposeNotifierAction => () => _measurementNotifier = null;
 
         #region Private instance methods
 
@@ -185,11 +188,14 @@ namespace BluetoothLevel.XFApp.Services
             return registered;
         }
 
-        private void NotifyAboutIncomingMessage(string message)
+        private void NotifyAboutIncomingBleMessage(byte[] incoming)
         {
-            if (!String.IsNullOrWhiteSpace(message))
+            if (incoming != null && incoming.Length > 0)
             {
-                message = message.Trim().ToUpper();
+                //Debug.WriteLine($"Received bytes: {GetByteString(incoming)}");
+                string message = Encoding.ASCII.GetString(incoming).Trim().ToUpper();
+                //Debug.WriteLine($"Translated to: {message}");
+                
                 foreach (string measurement in message.Split(':'))
                 {
                     string[] measurementParts = measurement.Split(',');
@@ -204,17 +210,8 @@ namespace BluetoothLevel.XFApp.Services
                                 : MeasurementType.Intermediate,
                             Value = value
                         };
-                        
-                        if (lvlMeasurement.MeasurementType == MeasurementType.Final)
-                        {
-                            Debug.WriteLine($"A final level measurement of: {lvlMeasurement.Value}");
-                        }
-                        else if (lvlMeasurement.MeasurementType == MeasurementType.Intermediate)
-                        {
-                            Debug.WriteLine($"An intermediate level measurement of: {lvlMeasurement.Value}");
-                        }
 
-                        //TODO: Must do something with this measurement
+                        _measurementNotifier?.NotifyMeasurement(lvlMeasurement);
                     }
                 }
             }
@@ -241,13 +238,9 @@ namespace BluetoothLevel.XFApp.Services
 
                 _rxCharacteristic.ValueUpdated += (sender, charUpdatedEventArgs) =>
                 {
-                    byte[] receivedBytes = charUpdatedEventArgs?.Characteristic?.Value;
-                    if (receivedBytes != null && receivedBytes.Length > 0)
+                    if (_measurementNotifier != null)
                     {
-                        Debug.WriteLine($"Received bytes: {GetByteString(receivedBytes)}");
-                        string translated = Encoding.ASCII.GetString(receivedBytes);
-                        Debug.WriteLine($"Translated to: {translated}");
-                        NotifyAboutIncomingMessage(translated);
+                        NotifyAboutIncomingBleMessage(charUpdatedEventArgs?.Characteristic?.Value);
                     }
                 };
 
@@ -363,6 +356,9 @@ namespace BluetoothLevel.XFApp.Services
 
             return result;
         }
+
+        public IObservable<LevelMeasurement> GetMeasurementNotifier() 
+            => (_measurementNotifier = new MeasurementObservable(DisposeNotifierAction));
 
         public Task<bool> RequestCalibration() => SendBleMessage("CA");
 
