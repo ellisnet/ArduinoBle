@@ -5,13 +5,19 @@ using BluetoothLevel.XFApp.Models;
 using BluetoothLevel.XFApp.Services;
 using Prism.Commands;
 using Prism.Navigation;
-
+using SkiaSharp;
 using Xamarin.Forms;
 
 namespace BluetoothLevel.XFApp.ViewModels
 {
-    public class LevelPageViewModel : BaseViewModel, IObserver<LevelMeasurement>
+    public class LevelPageViewModel : BaseViewModel, IObserver<LevelMeasurement>, ILevelValueProvider
     {
+        // ReSharper disable InconsistentNaming
+        private static readonly SKColor SafeColor = SKColor.Parse("#6ce26c");
+        private static readonly SKColor WarningColor = SKColor.Parse("#ffee62");
+        private static readonly SKColor AlarmColor = SKColor.Parse("#ff0000");
+        // ReSharper restore InconsistentNaming
+
         private ILevelApiService _levelApiService;
         private IDisposable _measurementSubscription;
 
@@ -30,6 +36,8 @@ namespace BluetoothLevel.XFApp.ViewModels
             get => _levelBorderColor;
             set => SetProperty(ref _levelBorderColor, value);
         }
+
+        public Action<int, SKColor> IndicatorUpdateAction { get; set; }
 
         #endregion
 
@@ -85,6 +93,28 @@ namespace BluetoothLevel.XFApp.ViewModels
 
         public void OnNext(LevelMeasurement value)
         {
+            SKColor indicatorColor = SafeColor;
+            if (Math.Abs(value.Value) > 300)
+            {
+                indicatorColor = AlarmColor;
+            }
+            else if (Math.Abs(value.Value) > 10)
+            {
+                indicatorColor = WarningColor;
+            }
+
+            int indicatorValue = value.Value + 1000;
+            if (indicatorValue < 0)
+            {
+                indicatorValue = 0;
+            }
+            else if (indicatorValue > 2000)
+            {
+                indicatorValue = 2000;
+            }
+
+            IndicatorUpdateAction?.Invoke(indicatorValue, indicatorColor);
+
             if (value.MeasurementType == MeasurementType.Final)
             {
                 Debug.WriteLine($"A final level measurement of: {value.Value}");

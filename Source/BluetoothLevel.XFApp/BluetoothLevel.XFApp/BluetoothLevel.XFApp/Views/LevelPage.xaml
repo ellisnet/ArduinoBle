@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:BluetoothLevel.XFApp.ViewModels;"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              BindingContext="{Binding Source={x:Static vm:DesignTimeViewModelLocator.LevelPage}}"
              x:Class="BluetoothLevel.XFApp.Views.LevelPage">
     <ContentPage.Content>
@@ -33,6 +34,8 @@
             <BoxView Grid.Row="1" Grid.Column="1" Margin="3" BackgroundColor="White"
                      HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></BoxView>
 
+            <skia:SKCanvasView x:Name="LevelIndicator" Grid.Row="1" Grid.Column="1" Margin="3" PaintSurface="LevelIndicator_OnPaintSurface"
+                               HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></skia:SKCanvasView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
