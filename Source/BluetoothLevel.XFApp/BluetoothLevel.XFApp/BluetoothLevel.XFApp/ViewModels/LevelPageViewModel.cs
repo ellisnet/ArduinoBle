@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using Acr.UserDialogs;
 using BluetoothLevel.XFApp.Models;
 using BluetoothLevel.XFApp.Services;
+using BluetoothLevel.XFApp.ViewModels.Interfaces;
 using Prism.Commands;
 using Prism.Navigation;
 using SkiaSharp;
@@ -35,6 +37,25 @@ namespace BluetoothLevel.XFApp.ViewModels
         {
             get => _levelBorderColor;
             set => SetProperty(ref _levelBorderColor, value);
+        }
+
+        private int _resolution = 0;
+        public int Resolution
+        {
+            get => _resolution;
+            set
+            {
+                if (_resolution != value)
+                {
+                    Debug.WriteLine($"Switching to a resolution of: {value}");
+                    _measurementSubscription?.Dispose();
+                    _measurementSubscription = _levelApiService
+                        .GetMeasurementNotifier()
+                        .Where(w => w.ValueDelta >= value || w.MeasurementType == MeasurementType.Final)
+                        .Subscribe(this);
+                }
+                SetProperty(ref _resolution, value);
+            }
         }
 
         public Action<int, SKColor> IndicatorUpdateAction { get; set; }
@@ -94,16 +115,16 @@ namespace BluetoothLevel.XFApp.ViewModels
         public void OnNext(LevelMeasurement value)
         {
             SKColor indicatorColor = SafeColor;
-            if (Math.Abs(value.Value) > 300)
+            if (Math.Abs(value.CurrentValue) > 300)
             {
                 indicatorColor = AlarmColor;
             }
-            else if (Math.Abs(value.Value) > 10)
+            else if (Math.Abs(value.CurrentValue) > 15)
             {
                 indicatorColor = WarningColor;
             }
 
-            int indicatorValue = value.Value + 1000;
+            int indicatorValue = value.CurrentValue + 1000;
             if (indicatorValue < 0)
             {
                 indicatorValue = 0;
@@ -117,13 +138,13 @@ namespace BluetoothLevel.XFApp.ViewModels
 
             if (value.MeasurementType == MeasurementType.Final)
             {
-                Debug.WriteLine($"A final level measurement of: {value.Value}");
+                Debug.WriteLine($"A final level measurement of: {value.CurrentValue}");
                 LevelBorderColor = Color.Blue;
                 IsLevelIdle = true;
             }
             else if (value.MeasurementType == MeasurementType.Intermediate)
             {
-                Debug.WriteLine($"An intermediate level measurement of: {value.Value}");
+                Debug.WriteLine($"An intermediate level measurement of: {value.CurrentValue}");
             }
         }
 

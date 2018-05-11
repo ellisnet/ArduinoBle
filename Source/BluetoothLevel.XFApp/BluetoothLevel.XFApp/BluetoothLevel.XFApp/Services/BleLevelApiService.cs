@@ -34,7 +34,8 @@ namespace BluetoothLevel.XFApp.Services
         private bool? _hasLocationPermission;
         private ICharacteristic _rxCharacteristic;
         private ICharacteristic _txCharacteristic;
-        private MeasurementObservable _measurementNotifier;
+        private MeasurementNotifier _measurementNotifier;
+        private int _previousValue;
 
         private Action DisposeNotifierAction => () => _measurementNotifier = null;
 
@@ -208,8 +209,11 @@ namespace BluetoothLevel.XFApp.Services
                             MeasurementType = (measurementParts[0].Trim() == "FINAL")
                                 ? MeasurementType.Final
                                 : MeasurementType.Intermediate,
-                            Value = value
+                            CurrentValue = value,
+                            PreviousValue = _previousValue
                         };
+
+                        _previousValue = value;
 
                         _measurementNotifier?.NotifyMeasurement(lvlMeasurement);
                     }
@@ -283,6 +287,7 @@ namespace BluetoothLevel.XFApp.Services
 
                 byte[] bytesToSend = Encoding.ASCII.GetBytes(message);
                 result = await _txCharacteristic.WriteAsync(bytesToSend);
+                _previousValue = 0;
             }
 
             return result;
@@ -358,7 +363,7 @@ namespace BluetoothLevel.XFApp.Services
         }
 
         public IObservable<LevelMeasurement> GetMeasurementNotifier() 
-            => (_measurementNotifier = new MeasurementObservable(DisposeNotifierAction));
+            => (_measurementNotifier = new MeasurementNotifier(DisposeNotifierAction));
 
         public Task<bool> RequestCalibration() => SendBleMessage("CA");
 

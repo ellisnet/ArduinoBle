@@ -1,7 +1,7 @@
 ﻿using System;
 using SkiaSharp;
 
-namespace BluetoothLevel.XFApp.ViewModels
+namespace BluetoothLevel.XFApp.ViewModels.Interfaces
 {
     public interface ILevelValueProvider
     {

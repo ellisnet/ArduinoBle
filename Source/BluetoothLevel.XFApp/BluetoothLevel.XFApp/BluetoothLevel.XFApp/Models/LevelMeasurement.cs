@@ -1,4 +1,6 @@
-﻿namespace BluetoothLevel.XFApp.Models
+﻿using System;
+
+namespace BluetoothLevel.XFApp.Models
 {
     public enum MeasurementType
     {
@@ -9,6 +11,8 @@
     public class LevelMeasurement
     {
         public MeasurementType MeasurementType { get; set; } = MeasurementType.Intermediate;
-        public int Value { get; set; }
+        public int CurrentValue { get; set; }
+        public int PreviousValue { get; set; }
+        public int ValueDelta => Math.Abs(CurrentValue - PreviousValue);
     }
 }

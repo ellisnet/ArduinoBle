@@ -3,7 +3,7 @@ using BluetoothLevel.XFApp.Models;
 
 namespace BluetoothLevel.XFApp.Observables
 {
-    public class MeasurementObservable : IObservable<LevelMeasurement>, IDisposable
+    public class MeasurementNotifier : IObservable<LevelMeasurement>, IDisposable
     {
         private IObserver<LevelMeasurement> _observer;
         private Action _disposeAction;
@@ -35,7 +35,7 @@ namespace BluetoothLevel.XFApp.Observables
             _observer?.OnCompleted();
         }
 
-        public MeasurementObservable(Action disposeAction)
+        public MeasurementNotifier(Action disposeAction)
         {
             _disposeAction = disposeAction;
         }

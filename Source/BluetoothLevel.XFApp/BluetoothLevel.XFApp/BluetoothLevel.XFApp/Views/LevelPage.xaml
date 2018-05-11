@@ -9,6 +9,7 @@
         <Grid Margin="20" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100" />
+                <RowDefinition Height="60" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -28,13 +29,16 @@
                         Command="{Binding RequestMeasurementCommand}"></Button>
             </Grid>
 
-            <BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="{Binding LevelBorderColor}"
+            <Slider Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Minimum="0" Maximum="20" HorizontalOptions="FillAndExpand"
+                    VerticalOptions="Center" Value="{Binding Resolution}"></Slider>
+
+            <BoxView Grid.Row="2" Grid.Column="1" BackgroundColor="{Binding LevelBorderColor}"
                      HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></BoxView>
 
-            <BoxView Grid.Row="1" Grid.Column="1" Margin="3" BackgroundColor="White"
+            <BoxView Grid.Row="2" Grid.Column="1" Margin="4" BackgroundColor="White"
                      HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></BoxView>
 
-            <skia:SKCanvasView x:Name="LevelIndicator" Grid.Row="1" Grid.Column="1" Margin="3" PaintSurface="LevelIndicator_OnPaintSurface"
+            <skia:SKCanvasView x:Name="LevelIndicator" Grid.Row="2" Grid.Column="1" Margin="4" PaintSurface="LevelIndicator_OnPaintSurface"
                                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></skia:SKCanvasView>
         </Grid>
     </ContentPage.Content>
