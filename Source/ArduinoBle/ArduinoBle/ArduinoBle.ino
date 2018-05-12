@@ -105,6 +105,9 @@ boolean prev_joystick_button_state = false;
 
 boolean scan_complete = false;
 
+boolean keypad_found = false;
+boolean joystick_found = false;
+
 // A small helper
 void error(const __FlashStringHelper*err) {
 	Serial.println(err);
@@ -320,6 +323,16 @@ void loop() {
 				Serial.print(address, HEX);
 				Serial.println("  !");
 
+				if (address == KEYPAD) {
+					keypad_found = true;
+					Serial.println("QWIIC keypad found.");
+				}
+
+				if (address == JOYSTICK) {
+					joystick_found = true;
+					Serial.println("QWIIC joystick found.");
+				}
+
 				nDevices++;
 			}
 			else if (error == 4)
@@ -341,159 +354,163 @@ void loop() {
 		scan_complete = true;
 	}
 
-	Wire.requestFrom(KEYPAD, 1);
-	byte keyboard_byte = Wire.read();
-	switch (keyboard_byte)
-	{
-	case KEY_STAR:
-		Serial.println("KEY * pressed.");
-		sendBleMsg("KS");
-		break;
-	case KEY_HASH:
-		Serial.println("KEY # pressed.");
-		sendBleMsg("KH");
-		break;
-	case KEY_0:
-		Serial.println("KEY 0 pressed.");
-		sendBleMsg("K0");
-		break;
-	case KEY_1:
-		Serial.println("KEY 1 pressed.");
-		sendBleMsg("K1");
-		break;
-	case KEY_2:
-		Serial.println("KEY 2 pressed.");
-		sendBleMsg("K2");
-		break;
-	case KEY_3:
-		Serial.println("KEY 3 pressed.");
-		sendBleMsg("K3");
-		break;
-	case KEY_4:
-		Serial.println("KEY 4 pressed.");
-		sendBleMsg("K4");
-		break;
-	case KEY_5:
-		Serial.println("KEY 5 pressed.");
-		sendBleMsg("K5");
-		break;
-	case KEY_6:
-		Serial.println("KEY 6 pressed.");
-		sendBleMsg("K6");
-		break;
-	case KEY_7:
-		Serial.println("KEY 7 pressed.");
-		sendBleMsg("K7");
-		break;
-	case KEY_8:
-		Serial.println("KEY 8 pressed.");
-		sendBleMsg("K8");
-		break;
-	case KEY_9:
-		Serial.println("KEY 9 pressed.");
-		sendBleMsg("K9");
-		break;
-	default:
-		break;
+	if (keypad_found) {
+		Wire.requestFrom(KEYPAD, 1);
+		byte keyboard_byte = Wire.read();
+		switch (keyboard_byte)
+		{
+		case KEY_STAR:
+			Serial.println("KEY * pressed.");
+			sendBleMsg("KS");
+			break;
+		case KEY_HASH:
+			Serial.println("KEY # pressed.");
+			sendBleMsg("KH");
+			break;
+		case KEY_0:
+			Serial.println("KEY 0 pressed.");
+			sendBleMsg("K0");
+			break;
+		case KEY_1:
+			Serial.println("KEY 1 pressed.");
+			sendBleMsg("K1");
+			break;
+		case KEY_2:
+			Serial.println("KEY 2 pressed.");
+			sendBleMsg("K2");
+			break;
+		case KEY_3:
+			Serial.println("KEY 3 pressed.");
+			sendBleMsg("K3");
+			break;
+		case KEY_4:
+			Serial.println("KEY 4 pressed.");
+			sendBleMsg("K4");
+			break;
+		case KEY_5:
+			Serial.println("KEY 5 pressed.");
+			sendBleMsg("K5");
+			break;
+		case KEY_6:
+			Serial.println("KEY 6 pressed.");
+			sendBleMsg("K6");
+			break;
+		case KEY_7:
+			Serial.println("KEY 7 pressed.");
+			sendBleMsg("K7");
+			break;
+		case KEY_8:
+			Serial.println("KEY 8 pressed.");
+			sendBleMsg("K8");
+			break;
+		case KEY_9:
+			Serial.println("KEY 9 pressed.");
+			sendBleMsg("K9");
+			break;
+		default:
+			break;
+		}
 	}
 
-	if (getJoystickButton() == JOY_BUTTON_DOWN) {
-		if (!prev_joystick_button_state) {
-			Serial.println("JOYSTICK button pressed.");
-			sendBleMsg("JB");
+	if (joystick_found) {
+		if (getJoystickButton() == JOY_BUTTON_DOWN) {
+			if (!prev_joystick_button_state) {
+				Serial.println("JOYSTICK button pressed.");
+				sendBleMsg("JB");
+			}
+			prev_joystick_button_state = true;
 		}
-		prev_joystick_button_state = true;
-	}
-	else {
-		prev_joystick_button_state = false;
-	}
-
-	int joystickH = getJoystickHorizontal();
-	int joystickV = getJoystickVertical();
-	byte joystickButton = getJoystickButton();
-
-	byte joystick_direction = JOY_CENTER;
-
-	byte joystick_horiz = JOY_CENTER_H;
-	if (joystickH < (512 - 40)) {
-		joystick_horiz = JOY_LEFT;
-	}
-	else if (joystickH >(512 + 40)) {
-		joystick_horiz = JOY_RIGHT;
-	}
-
-	byte joystick_vert = JOY_CENTER_H;
-	if (joystickV < (512 - 40)) {
-		joystick_vert = JOY_UP;
-	}
-	else if (joystickV >(512 + 40)) {
-		joystick_vert = JOY_DOWN;
-	}
-
-	if (joystick_horiz == JOY_CENTER_H & joystick_vert == JOY_UP) {
-		joystick_direction = JOY_N;
-	}
-	else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_UP) {
-		joystick_direction = JOY_NE;
-	}
-	else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_CENTER_V) {
-		joystick_direction = JOY_E;
-	}
-	else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_DOWN) {
-		joystick_direction = JOY_SE;
-	}
-	else if (joystick_horiz == JOY_CENTER_H & joystick_vert == JOY_DOWN) {
-		joystick_direction = JOY_S;
-	}
-	else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_DOWN) {
-		joystick_direction = JOY_SW;
-	}
-	else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_CENTER_V) {
-		joystick_direction = JOY_W;
-	}
-	else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_UP) {
-		joystick_direction = JOY_NW;
-	}
-
-	if (joystick_direction != prev_joystick_direction) {
-		if (joystick_direction == JOY_CENTER) {
-			Serial.println("JOYSTICK is CENTERED.");
-			sendBleMsg("JC");
-		}
-		else if (joystick_direction == JOY_N) {
-			Serial.println("JOYSTICK is NORTH.");
-			sendBleMsg("JN");
-		}
-		else if (joystick_direction == JOY_NE) {
-			Serial.println("JOYSTICK is NORTHEAST.");
-			sendBleMsg("JO");
-		}
-		else if (joystick_direction == JOY_E) {
-			Serial.println("JOYSTICK is EAST.");
-			sendBleMsg("JE");
-		}
-		else if (joystick_direction == JOY_SE) {
-			Serial.println("JOYSTICK is SOUTHEAST.");
-			sendBleMsg("JF");
-		}
-		else if (joystick_direction == JOY_S) {
-			Serial.println("JOYSTICK is SOUTH.");
-			sendBleMsg("JS");
-		}
-		else if (joystick_direction == JOY_SW) {
-			Serial.println("JOYSTICK is SOUTHWEST.");
-			sendBleMsg("JT");
-		}
-		else if (joystick_direction == JOY_W) {
-			Serial.println("JOYSTICK is WEST.");
-			sendBleMsg("JW");
-		}
-		else if (joystick_direction == JOY_NW) {
-			Serial.println("JOYSTICK is NORTHWEST.");
-			sendBleMsg("JX");
+		else {
+			prev_joystick_button_state = false;
 		}
 
-		prev_joystick_direction = joystick_direction;
+		int joystickH = getJoystickHorizontal();
+		int joystickV = getJoystickVertical();
+		byte joystickButton = getJoystickButton();
+
+		byte joystick_direction = JOY_CENTER;
+
+		byte joystick_horiz = JOY_CENTER_H;
+		if (joystickH < (512 - 40)) {
+			joystick_horiz = JOY_LEFT;
+		}
+		else if (joystickH >(512 + 40)) {
+			joystick_horiz = JOY_RIGHT;
+		}
+
+		byte joystick_vert = JOY_CENTER_H;
+		if (joystickV < (512 - 40)) {
+			joystick_vert = JOY_UP;
+		}
+		else if (joystickV >(512 + 40)) {
+			joystick_vert = JOY_DOWN;
+		}
+
+		if (joystick_horiz == JOY_CENTER_H & joystick_vert == JOY_UP) {
+			joystick_direction = JOY_N;
+		}
+		else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_UP) {
+			joystick_direction = JOY_NE;
+		}
+		else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_CENTER_V) {
+			joystick_direction = JOY_E;
+		}
+		else if (joystick_horiz == JOY_RIGHT & joystick_vert == JOY_DOWN) {
+			joystick_direction = JOY_SE;
+		}
+		else if (joystick_horiz == JOY_CENTER_H & joystick_vert == JOY_DOWN) {
+			joystick_direction = JOY_S;
+		}
+		else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_DOWN) {
+			joystick_direction = JOY_SW;
+		}
+		else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_CENTER_V) {
+			joystick_direction = JOY_W;
+		}
+		else if (joystick_horiz == JOY_LEFT & joystick_vert == JOY_UP) {
+			joystick_direction = JOY_NW;
+		}
+
+		if (joystick_direction != prev_joystick_direction) {
+			if (joystick_direction == JOY_CENTER) {
+				Serial.println("JOYSTICK is CENTERED.");
+				sendBleMsg("JC");
+			}
+			else if (joystick_direction == JOY_N) {
+				Serial.println("JOYSTICK is NORTH.");
+				sendBleMsg("JN");
+			}
+			else if (joystick_direction == JOY_NE) {
+				Serial.println("JOYSTICK is NORTHEAST.");
+				sendBleMsg("JO");
+			}
+			else if (joystick_direction == JOY_E) {
+				Serial.println("JOYSTICK is EAST.");
+				sendBleMsg("JE");
+			}
+			else if (joystick_direction == JOY_SE) {
+				Serial.println("JOYSTICK is SOUTHEAST.");
+				sendBleMsg("JF");
+			}
+			else if (joystick_direction == JOY_S) {
+				Serial.println("JOYSTICK is SOUTH.");
+				sendBleMsg("JS");
+			}
+			else if (joystick_direction == JOY_SW) {
+				Serial.println("JOYSTICK is SOUTHWEST.");
+				sendBleMsg("JT");
+			}
+			else if (joystick_direction == JOY_W) {
+				Serial.println("JOYSTICK is WEST.");
+				sendBleMsg("JW");
+			}
+			else if (joystick_direction == JOY_NW) {
+				Serial.println("JOYSTICK is NORTHWEST.");
+				sendBleMsg("JX");
+			}
+
+			prev_joystick_direction = joystick_direction;
+		}
 	}
 
 	green_button_state = digitalRead(GREEN_BUTTON);
