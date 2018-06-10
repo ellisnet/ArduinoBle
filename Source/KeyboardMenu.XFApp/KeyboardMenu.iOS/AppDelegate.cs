@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿using FFImageLoading.Forms.Platform;
+using FFImageLoading.Svg.Forms;
+using FFImageLoading.Transformations;
 using Foundation;
+using KeyboardMenu.Services;
+using Prism.Ioc;
 using UIKit;
 
 namespace KeyboardMenu.iOS
@@ -23,9 +24,27 @@ namespace KeyboardMenu.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
-            LoadApplication(new App());
+            LoadApplication(new App(new IosConfigService()));
 
             return base.FinishedLaunching(app, options);
+        }
+    }
+
+    public class IosConfigService : BaseAppConfigService
+    {
+        public override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            //Nothing to register yet
+        }
+
+        public IosConfigService()
+        {
+            //Initialize SVG image and transformation support
+            CachedImageRenderer.Init();
+            // ReSharper disable UnusedVariable
+            var ignoreImage = typeof(SvgCachedImage);
+            var ignoreTransformation = typeof(GrayscaleTransformation);
+            // ReSharper restore UnusedVariable
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -52,7 +53,15 @@ namespace KeyboardMenu.UWP
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
-                Xamarin.Forms.Forms.Init(e);
+                //Xamarin.Forms.Forms.Init(e);
+                // Needed for SVG and other image-rendering support
+                Xamarin.Forms.Forms.Init(e, new List<Assembly>
+                {
+                    typeof(FFImageLoading.Forms.CachedImage).GetTypeInfo().Assembly,
+                    typeof(FFImageLoading.Forms.Platform.CachedImageRenderer).GetTypeInfo().Assembly,
+                    typeof(FFImageLoading.Svg.Forms.SvgCachedImage).GetTypeInfo().Assembly,
+                    typeof(FFImageLoading.Transformations.GrayscaleTransformation).GetTypeInfo().Assembly
+                });
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

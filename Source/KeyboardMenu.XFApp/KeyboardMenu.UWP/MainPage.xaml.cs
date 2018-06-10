@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+﻿using FFImageLoading.Forms.Platform;
+using FFImageLoading.Svg.Forms;
+using FFImageLoading.Transformations;
+using KeyboardMenu.Services;
+using Prism.Ioc;
 
 namespace KeyboardMenu.UWP
 {
@@ -21,7 +12,25 @@ namespace KeyboardMenu.UWP
         {
             this.InitializeComponent();
 
-            LoadApplication(new KeyboardMenu.App());
+            LoadApplication(new KeyboardMenu.App(new UwpConfigService()));
+        }
+    }
+
+    public class UwpConfigService : BaseAppConfigService
+    {
+        public override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            //Nothing to register yet
+        }
+
+        public UwpConfigService()
+        {
+            //Initialize SVG image and transformation support
+            CachedImageRenderer.Init();
+            // ReSharper disable UnusedVariable
+            var ignoreImage = typeof(SvgCachedImage);
+            var ignoreTransformation = typeof(GrayscaleTransformation);
+            // ReSharper restore UnusedVariable
         }
     }
 }
