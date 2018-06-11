@@ -312,8 +312,14 @@ namespace KeyboardMenu.ViewModels
     public static class DesignTimeViewModelLocator
     {
         public static MainPageViewModel MainPage => null;
-        //public static ItemDetailViewModel ItemDetailPage => null;
+        public static ValueEntryPageViewModel ValueEntryPage => null;
         //public static ItemsViewModel ItemsPage => null;
         //public static NewItemViewModel NewItemPage => null;
+    }
+
+    public static class NavParamKey
+    {
+        public static string SelectedChoiceItem => "selectedChoiceItem";
+        public static string ValueUpdated => "valueUpdated";
     }
 }

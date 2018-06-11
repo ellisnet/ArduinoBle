@@ -36,8 +36,9 @@ namespace KeyboardMenu
 
             containerRegistry.RegisterForNavigation<NavigationPage>();
 	        containerRegistry.RegisterForNavigation<Views.MainPage, ViewModels.MainPageViewModel>();
+	        containerRegistry.RegisterForNavigation<Views.ValueEntryPage, ViewModels.ValueEntryPageViewModel>();
 
-	        containerRegistry.RegisterInstance(typeof(IUserDialogs), UserDialogs.Instance);
+            containerRegistry.RegisterInstance(typeof(IUserDialogs), UserDialogs.Instance);
         }
 
 		protected override void OnStart ()

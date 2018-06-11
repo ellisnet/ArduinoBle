@@ -1,17 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:KeyboardMenu.Views"
              xmlns:vm="clr-namespace:KeyboardMenu.ViewModels;"
+             xmlns:controls="clr-namespace:KeyboardMenu.Controls;"
              x:Class="KeyboardMenu.Views.MainPage"
              BindingContext="{Binding Source={x:Static vm:DesignTimeViewModelLocator.MainPage}}"
              Title="{Binding PageTitle}">
 
-    <StackLayout>
-        <!-- Place new controls here -->
-    	<Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
-    </StackLayout>
+    <Grid RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="70" />
+        </Grid.RowDefinitions>
+
+        <!--Top menu bar-->
+        <BoxView Grid.Row="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="LightSkyBlue"></BoxView>
+        <controls:RepeaterView Grid.Row="0" Orientation="Horizontal" ItemsSource="{Binding TopMenuItems}"
+                           VerticalOptions="FillAndExpand" HorizontalOptions="CenterAndExpand">
+            <controls:RepeaterView.ItemTemplate>
+                <DataTemplate>
+                    <controls:SvgImage Margin="10,6,10,6" WidthRequest="68" HeightRequest="68" 
+                                       Source="{Binding IconFile, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                                       IsGrayscale="{Binding IsActive, Converter={StaticResource BoolInverter}}">
+                        <controls:SvgImage.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ItemSelectedCommand}" />
+                        </controls:SvgImage.GestureRecognizers>
+                    </controls:SvgImage>
+                </DataTemplate>
+            </controls:RepeaterView.ItemTemplate>
+        </controls:RepeaterView>
+        
+        <!--Choice items list-->
+        <ListView Grid.Row="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="LightSkyBlue"
+                  ItemsSource="{Binding ChoiceItems}" RowHeight="150" SeparatorColor="Transparent">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Frame Margin="10" Padding="20" BackgroundColor="WhiteSmoke" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" CornerRadius="10">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ItemSelectedCommand}" />
+                            </Frame.GestureRecognizers>
+                            <Grid Margin="4" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <controls:SvgImage Grid.Column="0" Source="{Binding IconFile, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                                                   HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="120" WidthRequest="120"></controls:SvgImage>
+                                <Grid Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label Margin="40,0,0,0" Grid.Row="0" FontSize="26" Text="{Binding Name}" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"></Label>
+                                    <Label Margin="40,0,0,0" Grid.Row="1" FontSize="26" Text="{Binding Value}" HorizontalTextAlignment="Start" VerticalTextAlignment="Center"></Label>
+                                </Grid>
+                            </Grid>
+                        </Frame>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!--Bottom menu bar-->
+        <BoxView Grid.Row="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="LightSkyBlue"></BoxView>
+        <ScrollView Grid.Row="2" Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <controls:RepeaterView Orientation="Horizontal" ItemsSource="{Binding BottomMenuItems}"
+                                   VerticalOptions="FillAndExpand" HorizontalOptions="StartAndExpand">
+                <controls:RepeaterView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:SvgImage Margin="10,10,10,10" WidthRequest="50" HeightRequest="50" 
+                                           Source="{Binding IconFile, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                                           IsGrayscale="{Binding IsActive, Converter={StaticResource BoolInverter}}">
+                            <controls:SvgImage.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ItemSelectedCommand}" />
+                            </controls:SvgImage.GestureRecognizers>
+                        </controls:SvgImage>
+                    </DataTemplate>
+                </controls:RepeaterView.ItemTemplate>
+            </controls:RepeaterView>
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:KeyboardMenu.ViewModels;"
+             x:Class="KeyboardMenu.Views.ValueEntryPage"
+             BindingContext="{Binding Source={x:Static vm:DesignTimeViewModelLocator.ValueEntryPage}}"
+             Title="{Binding PageTitle}"
+             NavigationPage.HasBackButton="True">
+    <ContentPage.Content>
+        <StackLayout VerticalOptions="CenterAndExpand" 
+            HorizontalOptions="CenterAndExpand">
+            <Label Text="{Binding EntryPrompt}" FontSize="22"/>
+            <Entry Text="{Binding EnteredValue}" Keyboard="Numeric" Completed="ValueEntryCompleted" FontSize="22"></Entry>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
