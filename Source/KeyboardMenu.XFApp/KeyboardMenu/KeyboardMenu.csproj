@@ -48,6 +48,7 @@
     <None Remove="Icons\business-graph-5.svg" />
     <None Remove="Icons\business-graph.svg" />
     <None Remove="Icons\business.svg" />
+    <None Remove="Icons\closemenu.svg" />
     <None Remove="Icons\hardware-chip-1.svg" />
     <None Remove="Icons\hardware-chip-2.svg" />
     <None Remove="Icons\hardware-chip-3.svg" />
@@ -223,6 +224,7 @@
     <EmbeddedResource Include="Icons\business-graph-5.svg" />
     <EmbeddedResource Include="Icons\business-graph.svg" />
     <EmbeddedResource Include="Icons\business.svg" />
+    <EmbeddedResource Include="Icons\closemenu.svg" />
     <EmbeddedResource Include="Icons\hardware-chip-1.svg" />
     <EmbeddedResource Include="Icons\hardware-chip-2.svg" />
     <EmbeddedResource Include="Icons\hardware-chip-3.svg" />

@@ -11,17 +11,27 @@ using KeyboardMenu.Models;
 using KeyboardMenu.Views;
 using Prism.Commands;
 using Prism.Navigation;
+using Xamarin.Forms;
+using MenuItem = KeyboardMenu.Models.MenuItem;
 
 namespace KeyboardMenu.ViewModels
 {
     public class MainPageViewModel : ViewModelBase, IObserver<KeyboardMessage>
     {
+        private static readonly string closeIconName = "closemenu.svg";
+
         private readonly IList<MenuItem> _menuItems;
         private readonly IBleKeyboardService _keyboardService;
         private bool _scannedForKeyboard;
         private IDisposable _keyboardSubscription;
         private Timer _scanTimer;
         private int _selectedChoiceIndex;
+
+        private int _selectedTopMenuIndex;
+        private int _selectedBottomMenuIndex;
+        private int _tempTopMenuIndex;
+        private int _tempBottomMenuIndex;
+        private int _menuRowIndex;
 
         #region Bindable properties
 
@@ -41,6 +51,34 @@ namespace KeyboardMenu.ViewModels
         public ObservableCollection<SelectableItemViewModel<ChoiceItem>> ChoiceItems { get; set; } 
             = new ObservableCollection<SelectableItemViewModel<ChoiceItem>>();
 
+        // ReSharper disable InconsistentNaming
+        public string MenuImage1_1 => GetIconFilePath(GetMenuIcon(1, 1));
+        public string MenuImage1_2 => GetIconFilePath(GetMenuIcon(1, 2));
+        public string MenuImage1_3 => GetIconFilePath(GetMenuIcon(1, 3));
+        public string MenuImage1_4 => GetIconFilePath(GetMenuIcon(1, 4));
+        public string MenuImage1_5 => GetIconFilePath(GetMenuIcon(1, 5));
+        public string MenuImage2_1 => GetIconFilePath(GetMenuIcon(2, 1));
+        public string MenuImage2_2 => GetIconFilePath(GetMenuIcon(2, 2));
+        public string MenuImage2_3 => GetIconFilePath(GetMenuIcon(2, 3));
+        public string MenuImage2_4 => GetIconFilePath(GetMenuIcon(2, 4));
+        public string MenuImage2_5 => GetIconFilePath(GetMenuIcon(2, 5));
+        public string MenuImage3_1 => GetIconFilePath(GetMenuIcon(3, 1));
+        public string MenuImage3_2 => GetIconFilePath(GetMenuIcon(3, 2));
+        public string MenuImage3_3 => GetIconFilePath(GetMenuIcon(3, 3));
+        public string MenuImage3_4 => GetIconFilePath(GetMenuIcon(3, 4));
+        public string MenuImage3_5 => GetIconFilePath(GetMenuIcon(3, 5));
+        public string MenuImage4_1 => GetIconFilePath(GetMenuIcon(4, 1));
+        public string MenuImage4_2 => GetIconFilePath(GetMenuIcon(4, 2));
+        public string MenuImage4_3 => GetIconFilePath(GetMenuIcon(4, 3));
+        public string MenuImage4_4 => GetIconFilePath(GetMenuIcon(4, 4));
+        public string MenuImage4_5 => GetIconFilePath(GetMenuIcon(4, 5));
+        public string MenuImage5_1 => GetIconFilePath(GetMenuIcon(5, 1));
+        public string MenuImage5_2 => GetIconFilePath(GetMenuIcon(5, 2));
+        public string MenuImage5_3 => GetIconFilePath(GetMenuIcon(5, 3));
+        public string MenuImage5_4 => GetIconFilePath(GetMenuIcon(5, 4));
+        public string MenuImage5_5 => GetIconFilePath(GetMenuIcon(5, 5));
+        // ReSharper restore InconsistentNaming
+
         #endregion
 
         #region Commands and their implementations
@@ -54,6 +92,92 @@ namespace KeyboardMenu.ViewModels
         #endregion
 
         #endregion
+
+        private void NotifyMenuIconsChanged()
+        {
+            NotifyPropertyChanged(nameof(MenuImage1_1));
+            NotifyPropertyChanged(nameof(MenuImage1_2));
+            NotifyPropertyChanged(nameof(MenuImage1_3));
+            NotifyPropertyChanged(nameof(MenuImage1_4));
+            NotifyPropertyChanged(nameof(MenuImage1_5));
+            NotifyPropertyChanged(nameof(MenuImage2_1));
+            NotifyPropertyChanged(nameof(MenuImage2_2));
+            NotifyPropertyChanged(nameof(MenuImage2_3));
+            NotifyPropertyChanged(nameof(MenuImage2_4));
+            NotifyPropertyChanged(nameof(MenuImage2_5));
+            NotifyPropertyChanged(nameof(MenuImage3_1));
+            NotifyPropertyChanged(nameof(MenuImage3_2));
+            NotifyPropertyChanged(nameof(MenuImage3_3));
+            NotifyPropertyChanged(nameof(MenuImage3_4));
+            NotifyPropertyChanged(nameof(MenuImage3_5));
+            NotifyPropertyChanged(nameof(MenuImage4_1));
+            NotifyPropertyChanged(nameof(MenuImage4_2));
+            NotifyPropertyChanged(nameof(MenuImage4_3));
+            NotifyPropertyChanged(nameof(MenuImage4_4));
+            NotifyPropertyChanged(nameof(MenuImage4_5));
+            NotifyPropertyChanged(nameof(MenuImage5_1));
+            NotifyPropertyChanged(nameof(MenuImage5_2));
+            NotifyPropertyChanged(nameof(MenuImage5_3));
+            NotifyPropertyChanged(nameof(MenuImage5_4));
+            NotifyPropertyChanged(nameof(MenuImage5_5));
+        }
+
+        private string GetIconFilePath(string filename) => (String.IsNullOrWhiteSpace(filename))
+            ? null : $"Icons/{filename}";
+
+        private string GetMenuIcon(int row, int column)
+        {
+            string result = null;
+
+            if (InMenuMode && row > 0 && row < 6 && column > 0 && column < 6)
+            {
+                do
+                {
+                    if (_menuRowIndex == 0 && row == 1) { break; }
+                    if (_menuRowIndex == 0 && row == 2) { break; }
+                    if (_menuRowIndex == 1 && row == 1) { break; }
+                    if (_menuRowIndex == 1 && row == 5) { break; }
+                    if (_menuRowIndex == 2 && row == 4) { break; }
+                    if (_menuRowIndex == 2 && row == 5) { break; }
+
+                    if ((_menuRowIndex == 0 && row == 5 && column == 3)
+                        || (_menuRowIndex == 1 && row == 4 && column == 3)
+                        || (_menuRowIndex == 2 && row == 3 && column == 3))
+                    {
+                        result = closeIconName;
+                        break;
+                    }
+
+                    if ((_menuRowIndex == 0 && row == 3)
+                        || (_menuRowIndex == 1 && row == 2)
+                        || (_menuRowIndex == 2 && row == 1))
+                    {
+                        //Need to figure out which top menu icon to show
+                        int itemIndex = (column - 3) + _tempTopMenuIndex;
+                        if (itemIndex > -1 && itemIndex < _menuItems.Count)
+                        {
+                            result = _menuItems[itemIndex].IconFile;
+                        }
+                    }
+
+                    if ((_menuRowIndex == 0 && row == 4)
+                        || (_menuRowIndex == 1 && row == 3)
+                        || (_menuRowIndex == 2 && row == 2))
+                    {
+                        //Need to figure out which top menu icon to show
+                        int itemIndex = (column - 3) + _tempBottomMenuIndex;
+                        IList<SubMenuItem> bottomItems = _menuItems[_tempTopMenuIndex].SubMenuItems;
+                        if (itemIndex > -1 && itemIndex < bottomItems.Count)
+                        {
+                            result = bottomItems[itemIndex].IconFile;
+                        }
+                    }
+
+                } while (false);
+            }
+
+            return result;
+        }
 
         public void OnCompleted()
         {
@@ -72,6 +196,71 @@ namespace KeyboardMenu.ViewModels
                 if (InMenuMode && KeyboardMessage.JoystickMessages.Contains(value.Message))
                 {
                     //Navigate the menu
+                    if (value.Message == BleMessage.JoystickWest)
+                    {
+                        if (_menuRowIndex == 0 && _tempTopMenuIndex > 0)
+                        {
+                            _tempTopMenuIndex--;
+                            _tempBottomMenuIndex = 0;
+                            NotifyMenuIconsChanged();
+                        }
+                        else if (_menuRowIndex == 1 && _tempBottomMenuIndex > 0)
+                        {
+                            _tempBottomMenuIndex--;
+                            NotifyMenuIconsChanged();
+                        }
+                    }
+                    else if (value.Message == BleMessage.JoystickEast)
+                    {
+                        if (_menuRowIndex == 0 && _tempTopMenuIndex < (_menuItems.Count - 1))
+                        {
+                            _tempTopMenuIndex++;
+                            _tempBottomMenuIndex = 0;
+                            NotifyMenuIconsChanged();
+                        }
+                        else if (_menuRowIndex == 1
+                                 && _tempBottomMenuIndex < (_menuItems[_tempTopMenuIndex].SubMenuItems.Count - 1))
+                        {
+                            _tempBottomMenuIndex++;
+                            NotifyMenuIconsChanged();
+                        }
+                    }
+                    else if (value.Message == BleMessage.JoystickNorth && _menuRowIndex > 0)
+                    {
+                        _menuRowIndex--;
+                        NotifyMenuIconsChanged();
+                    }
+                    else if (value.Message == BleMessage.JoystickSouth && _menuRowIndex < 2)
+                    {
+                        _menuRowIndex++;
+                        NotifyMenuIconsChanged();
+                    }
+                    else if (value.Message == BleMessage.JoystickButton)
+                    {
+                        if (_menuRowIndex == 0 && _tempTopMenuIndex != _selectedTopMenuIndex)
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                TopMenuItemSelected(_menuItems[_tempTopMenuIndex]);
+                            });                           
+                        }
+                        else if (_menuRowIndex == 1 && (_tempTopMenuIndex != _selectedTopMenuIndex))
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                TopMenuItemSelected(_menuItems[_tempTopMenuIndex]);
+                                BottomMenuItemSelected(_menuItems[_tempTopMenuIndex].SubMenuItems[_tempBottomMenuIndex]);
+                            });
+                        }
+                        else if (_menuRowIndex == 1 && (_tempBottomMenuIndex != _selectedBottomMenuIndex))
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                BottomMenuItemSelected(_menuItems[_tempTopMenuIndex].SubMenuItems[_tempBottomMenuIndex]);
+                            });
+                        }
+                        InMenuMode = false;
+                    }
                 }
                 else if (KeyboardMessage.JoystickMessages.Contains(value.Message))
                 {
@@ -110,7 +299,16 @@ namespace KeyboardMenu.ViewModels
                 else if (KeyboardMessage.ButtonMessages.Contains(value.Message))
                 {
                     //Handle button presses
-                    if (value.Message == BleMessage.ButtonGreen) { InMenuMode = !InMenuMode;} //Toggle menu on and off
+                    if (value.Message == BleMessage.ButtonGreen)
+                    {
+                        _tempTopMenuIndex = _selectedTopMenuIndex;
+                        _tempBottomMenuIndex = _selectedBottomMenuIndex;
+                        _menuRowIndex = 0;
+
+                        //Toggle menu on and off
+                        InMenuMode = !InMenuMode;
+                        NotifyMenuIconsChanged();
+                    } 
                 }
             }
         }
@@ -119,10 +317,12 @@ namespace KeyboardMenu.ViewModels
         {
             bool itemChanged = false;
             IList<SubMenuItem> subMenuItems = null;
+            int index = 0;
             foreach (MenuItem item in _menuItems)
             {
                 if (item == menuItem)
                 {
+                    _selectedTopMenuIndex = index;
                     itemChanged = !item.IsActive;
                     item.IsActive = true;
                     subMenuItems = item.SubMenuItems;
@@ -131,17 +331,20 @@ namespace KeyboardMenu.ViewModels
                 {
                     item.IsActive = false;
                 }
+
+                index++;
             }
 
             if (itemChanged)
             {
+                _selectedBottomMenuIndex = 0;
                 TopMenuItems.ResetItems(_menuItems
                     .Select(s => new SelectableItemViewModel<MenuItem>(s, TopMenuItemSelected)).ToArray());
                 if (subMenuItems != null)
                 {
                     for (int i = 0; i < subMenuItems.Count; i++)
                     {
-                        subMenuItems[i].IsActive = (i == 0);
+                        subMenuItems[i].IsActive = (i == _selectedBottomMenuIndex);
                     }
 
                     SubMenuItem selectedSubMenuItem = subMenuItems[0];
@@ -161,10 +364,12 @@ namespace KeyboardMenu.ViewModels
             IList<SubMenuItem> subMenuItems = _menuItems.Single(s => s.IsActive).SubMenuItems;
             IList<ChoiceItem> choiceItems = null;
 
+            int index = 0;
             foreach (SubMenuItem item in subMenuItems)
             {
                 if (item == menuItem)
                 {
+                    _selectedBottomMenuIndex = index;
                     itemChanged = !item.IsActive;
                     item.IsActive = true;
                     choiceItems = item.ChoiceItems;
@@ -173,6 +378,8 @@ namespace KeyboardMenu.ViewModels
                 {
                     item.IsActive = false;
                 }
+
+                index++;
             }
 
             if (itemChanged)

@@ -88,11 +88,115 @@
         </ScrollView>
 
         <!--Keyboard controlled menu-->
-        <BoxView Grid.Row="0" Grid.RowSpan="3" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="LightSlateGray" Opacity="0.7" IsVisible="{Binding InMenuMode}">
+        <BoxView Grid.Row="0" Grid.RowSpan="3" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="DimGray" Opacity="0.9" IsVisible="{Binding InMenuMode}">
             <BoxView.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding DoNothingCommand}" />
             </BoxView.GestureRecognizers>
         </BoxView>
+        <Grid Grid.Row="0" Grid.RowSpan="3" RowSpacing="30" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding InMenuMode}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="90" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <!--Row 1-->
+            <controls:SvgImage Grid.Row="1" Grid.Column="1" 
+                               Source="{Binding MenuImage1_1, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="1" Grid.Column="2" 
+                               Source="{Binding MenuImage1_2, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="1" Grid.Column="3" 
+                               Source="{Binding MenuImage1_3, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="1" Grid.Column="4" 
+                               Source="{Binding MenuImage1_4, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="1" Grid.Column="5" 
+                               Source="{Binding MenuImage1_5, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+
+            <!--Row 2-->
+            <controls:SvgImage Grid.Row="2" Grid.Column="1" 
+                               Source="{Binding MenuImage2_1, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="2" Grid.Column="2" 
+                               Source="{Binding MenuImage2_2, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="2" Grid.Column="3" 
+                               Source="{Binding MenuImage2_3, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="2" Grid.Column="4" 
+                               Source="{Binding MenuImage2_4, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="2" Grid.Column="5" 
+                               Source="{Binding MenuImage2_5, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+
+            <!--Row 3-->
+            <controls:SvgImage Grid.Row="3" Grid.Column="1" 
+                               Source="{Binding MenuImage3_1, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="3" Grid.Column="2" 
+                               Source="{Binding MenuImage3_2, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="3" Grid.Column="3" 
+                               Source="{Binding MenuImage3_3, Converter={StaticResource EmbeddedResourcePathToUri}}" />
+            <controls:SvgImage Grid.Row="3" Grid.Column="4" 
+                               Source="{Binding MenuImage3_4, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="3" Grid.Column="5" 
+                               Source="{Binding MenuImage3_5, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+
+            <!--Row 4-->
+            <controls:SvgImage Grid.Row="4" Grid.Column="1" 
+                               Source="{Binding MenuImage4_1, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="4" Grid.Column="2" 
+                               Source="{Binding MenuImage4_2, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="4" Grid.Column="3" 
+                               Source="{Binding MenuImage4_3, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="4" Grid.Column="4" 
+                               Source="{Binding MenuImage4_4, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="4" Grid.Column="5" 
+                               Source="{Binding MenuImage4_5, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+
+            <!--Row 5-->
+            <controls:SvgImage Grid.Row="5" Grid.Column="1" 
+                               Source="{Binding MenuImage5_1, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="5" Grid.Column="2" 
+                               Source="{Binding MenuImage5_2, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="5" Grid.Column="3" 
+                               Source="{Binding MenuImage5_3, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="5" Grid.Column="4" 
+                               Source="{Binding MenuImage5_4, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+            <controls:SvgImage Grid.Row="5" Grid.Column="5" 
+                               Source="{Binding MenuImage5_5, Converter={StaticResource EmbeddedResourcePathToUri}}"
+                               IsGrayscale="True" />
+        </Grid>
 
     </Grid>
 
