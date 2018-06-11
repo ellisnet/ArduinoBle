@@ -21,9 +21,10 @@ namespace KeyboardMenu.ViewModels
         public DelegateCommand ItemSelectedCommand => _itemSelectedCommand
             ?? (_itemSelectedCommand = new DelegateCommand(() => _selectAction.Invoke(Item)));
 
-        public void NotifyValueChanged()
+        public void NotifyChanged()
         {
             OnPropertyChanged(nameof(Value));
+            OnPropertyChanged(nameof(IsActive));
         }
 
         public SelectableItemViewModel(T item, Action<T> selectAction)

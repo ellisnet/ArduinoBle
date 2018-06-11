@@ -1,6 +1,7 @@
 using System;
 using Acr.UserDialogs;
 using KeyboardMenu.Interfaces;
+using KeyboardMenu.Services;
 using Prism.Ioc;
 using Prism.Unity;
 using Xamarin.Forms;
@@ -39,7 +40,9 @@ namespace KeyboardMenu
 	        containerRegistry.RegisterForNavigation<Views.ValueEntryPage, ViewModels.ValueEntryPageViewModel>();
 
             containerRegistry.RegisterInstance(typeof(IUserDialogs), UserDialogs.Instance);
-        }
+	        containerRegistry.RegisterInstance(typeof(IBleKeyboardService),
+	            new BleKeyboardService(UserDialogs.Instance));
+	    }
 
 		protected override void OnStart ()
 		{

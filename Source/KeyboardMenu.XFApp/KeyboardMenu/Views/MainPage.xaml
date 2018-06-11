@@ -46,6 +46,11 @@
                                     <ColumnDefinition Width="100" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
+                                <BoxView Grid.Column="0" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
+                                         IsVisible="{Binding IsActive}" Color="CornflowerBlue"></BoxView>
+                                <BoxView Grid.Column="0" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
+                                         Margin="2" Color="WhiteSmoke"></BoxView>
+
                                 <controls:SvgImage Grid.Column="0" Source="{Binding IconFile, Converter={StaticResource EmbeddedResourcePathToUri}}"
                                                    HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="120" WidthRequest="120"></controls:SvgImage>
                                 <Grid Grid.Column="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
@@ -81,6 +86,13 @@
                 </controls:RepeaterView.ItemTemplate>
             </controls:RepeaterView>
         </ScrollView>
+
+        <!--Keyboard controlled menu-->
+        <BoxView Grid.Row="0" Grid.RowSpan="3" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="LightSlateGray" Opacity="0.7" IsVisible="{Binding InMenuMode}">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding DoNothingCommand}" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
 
     </Grid>
 
