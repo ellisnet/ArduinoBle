@@ -305,7 +305,8 @@ namespace BluetoothLevel.XFApp.Services
 
                 ShowToast("Scanning for BLE devices...");
 
-                _hasLocationPermission = await CheckLocationPermission(_hasLocationPermission);
+                _hasLocationPermission = (Device.RuntimePlatform == Device.UWP)
+                    || (await CheckLocationPermission(_hasLocationPermission) ?? false);
 
                 if (_hasLocationPermission.GetValueOrDefault(false))
                 {
