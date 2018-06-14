@@ -1,15 +1,16 @@
-﻿using System;
+﻿//Code from here:
+// https://github.com/xabre/xamarin-bluetooth-le/tree/uwp_creators_update/Source
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Toolkit.Uwp.Connectivity;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using BluetoothLevel.Net.BleHelper;
 
-using Plugin.BLE.Abstractions;
-using Plugin.BLE.Abstractions.Contracts;
-
-namespace Plugin.BLE.UWP
+namespace BluetoothLevel.Net.BleAdapter
 {
     class Service : ServiceBase
     {
@@ -22,7 +23,7 @@ namespace Plugin.BLE.UWP
 
         public Service(GattDeviceService service, IDevice device) : base(device)
         {
-            _nativeDevice = (ObservableBluetoothLEDevice) device.NativeDevice;
+            _nativeDevice = (ObservableBluetoothLEDevice)device.NativeDevice;
             _nativeService = service;
         }
 
@@ -30,7 +31,8 @@ namespace Plugin.BLE.UWP
         {
             var nativeChars = (await _nativeService.GetCharacteristicsAsync()).Characteristics;
             var charList = new List<ICharacteristic>();
-            foreach (var nativeChar in nativeChars)
+            var nativeCharArray = nativeChars.ToArray();  //TODO: Not getting any results here
+            foreach (var nativeChar in nativeCharArray)
             {
                 var characteristic = new Characteristic(nativeChar, this);
                 Debug.WriteLine($"Characteristic found: {characteristic.Id}");

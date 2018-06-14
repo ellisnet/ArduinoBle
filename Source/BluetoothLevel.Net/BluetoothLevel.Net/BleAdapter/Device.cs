@@ -1,17 +1,17 @@
-﻿using System;
+﻿//Code from here:
+// https://github.com/xabre/xamarin-bluetooth-le/tree/uwp_creators_update/Source
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Toolkit.Uwp.Connectivity;
 using Windows.Devices.Bluetooth;
+using BluetoothLevel.Net.BleHelper;
 
-using Plugin.BLE.Abstractions;
-using Plugin.BLE.Abstractions.Contracts;
-
-namespace Plugin.BLE.UWP
+namespace BluetoothLevel.Net.BleAdapter
 {
     class Device : DeviceBase
     {
@@ -64,7 +64,7 @@ namespace Plugin.BLE.UWP
             throw new NotImplementedException();
         }
 
-        protected async override Task<IEnumerable<IService>> GetServicesNativeAsync()
+        protected override async Task<IEnumerable<IService>> GetServicesNativeAsync()
         {
             var GattServiceList = (await _nativeDevice.BluetoothLEDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached)).Services;
             var ServiceList = new List<IService>();
@@ -87,7 +87,7 @@ namespace Plugin.BLE.UWP
         protected override Task<int> RequestMtuNativeAsync(int requestValue)
         {
             Trace.Message("Request MTU not supported in UWP");
-            return Task.FromResult(-1); 
+            return Task.FromResult(-1);
         }
 
         protected override bool UpdateConnectionIntervalNative(ConnectionInterval interval)
