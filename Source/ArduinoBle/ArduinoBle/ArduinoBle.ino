@@ -10,6 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <Adafruit_NeoPixel.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_BLE.h>
@@ -46,7 +47,11 @@ limitations under the License.
 //END Adafruit BLE settings
 
 #define JOYSTICK 0x20
-#define KEYPAD 0x4B
+#define KEYPAD 0x06
+#define GPIO_BOARD 0x27
+
+#define NEOPIXEL_PIN 9
+#define NEOPIXEL_LED_COUNT 2
 
 const int ONBOARD_LED = 13;
 
@@ -54,6 +59,8 @@ const int GREEN_BUTTON = 2;
 const int BLUE_BUTTON = 3;
 const int RED_BUTTON = 5;
 const int YELLOW_BUTTON = 6;
+
+const int POWER_BUTTON = 6;
 
 const byte KEY_STAR = 0x2A;
 const byte KEY_HASH = 0x23;
@@ -100,6 +107,26 @@ int prev_blue_button_state = LOW;
 int prev_red_button_state = LOW;
 int prev_yellow_button_state = LOW;
 
+int power_button_state = LOW;
+int menu_button_state = LOW;
+int up_button_state = LOW;
+int left_button_state = LOW;
+int enter_button_state = LOW;
+int right_button_state = LOW;
+int down_button_state = LOW;
+int shift_button_state = LOW;
+int backspace_button_state = LOW;
+
+int prev_power_button_state = LOW;
+int prev_menu_button_state = LOW;
+int prev_up_button_state = LOW;
+int prev_left_button_state = LOW;
+int prev_enter_button_state = LOW;
+int prev_right_button_state = LOW;
+int prev_down_button_state = LOW;
+int prev_shift_button_state = LOW;
+int prev_backspace_button_state = LOW;
+
 byte prev_joystick_direction = JOY_CENTER;
 boolean prev_joystick_button_state = false;
 
@@ -107,6 +134,10 @@ boolean scan_complete = false;
 
 boolean keypad_found = false;
 boolean joystick_found = false;
+boolean gpio_board_found = false;
+
+//Setup for NeoPixels
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NEOPIXEL_LED_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // A small helper
 void error(const __FlashStringHelper*err) {
@@ -114,7 +145,7 @@ void error(const __FlashStringHelper*err) {
 	while (1);
 }
 
-//BEGIN joystick functions
+//BEGIN Joystick functions
 
 int reading_joystick = 0;
 
@@ -177,7 +208,108 @@ byte getJoystickButton() {
 	return btnbyte;
 }
 
-//END joystick functions
+//END Joystick functions
+
+//BEGIN Qwiic gpio board functions
+
+#define REGISTER_INPUT_PORT           	0x00    //register 0 
+#define REGISTER_OUTPUT_PORT          	0X01    //register 1
+#define REGISTER_CONFIGURATION			0X03	//register 3
+
+/*
+	readRegister(byte address, byte registerToRead) will read the register
+	values of a given register at a given address.
+	Inputs: address, register values
+*/
+byte readRegister(byte address, byte registerToRead) {
+	Wire.beginTransmission(address);
+	Wire.write(registerToRead);
+	Wire.endTransmission(false);
+	Wire.requestFrom((int)address, 1);
+
+	byte currentRegisterValue = 0;
+
+	byte count = 0;
+	while (Wire.available() > 0) {
+		if (count == 0) {
+			currentRegisterValue = Wire.read();
+		}
+		Wire.read(); // don't collect
+		count++;
+	}
+	return currentRegisterValue;
+}
+
+/*
+	writeRegister(byte address, byte registerToWrite, byte valueToWrite) writes the
+	value passed to a specific register at the Qwiic GPIO address.
+
+	Note: when writing to a register a full 8 bits is written- overwriting any
+	previous state.
+
+	Inputs: Qwiic Gpio Address, Register to write to, and Byte to write
+*/
+void writeRegister(byte address, byte registerToWrite, byte valueToWrite) {
+	Wire.beginTransmission(address);
+	Wire.write(registerToWrite);
+	Wire.write(valueToWrite);
+	Wire.endTransmission();
+}
+
+/*
+	setPinMode(byte address, byte pin, byte direction) sets a single pin
+	as an input or an output and does not affect the other pins. The direction
+	input parameter is either INPUT or OUTPUT.
+
+		similar to pinMode()
+*/
+void setPinMode(byte address, byte pin, byte direction) {
+	byte currentPinDirection = readRegister(address, REGISTER_CONFIGURATION);
+	pin = 1 << pin;
+
+	if (direction == INPUT || direction == INPUT_PULLUP) {
+		currentPinDirection |= pin; // pin will come in correctly masked because of a define. 
+	}
+	else if (direction == OUTPUT) {
+		currentPinDirection &= ~(pin);
+	}
+	writeRegister(address, REGISTER_CONFIGURATION, currentPinDirection);
+}
+
+/*
+	readPin(byte address, byte pin) reads the input state of the specified pin
+	and returns the corresponding pin's state.
+
+	similar to digitalRead()
+*/
+byte readPin(byte address, byte pin) {
+	byte currentRegisterValue = readRegister(address, REGISTER_INPUT_PORT);
+	if (currentRegisterValue & (1 << pin)) {
+		return HIGH;
+	}
+	return LOW;
+}
+
+/*
+	setPinOutput(byte address, byte pin, byte state) will set a pin as high or low
+
+			similar to digitalWrite(pin, state)
+*/
+void setPinOutput(byte address, byte pin, byte state) {
+	pin = 1 << pin;
+
+	byte currentRegisterValue = readRegister(address, REGISTER_OUTPUT_PORT);
+
+	if (state == LOW) { //INVERSE OF ARDUINO, but this will result in the same effect a user would expect. 
+		currentRegisterValue |= pin;
+	}
+	else if (state == HIGH) {
+		currentRegisterValue &= ~pin;
+	}
+	writeRegister(address, REGISTER_OUTPUT_PORT, currentRegisterValue);
+}
+
+//END Qwiic gpio board functions
 
 //BEGIN Adafruit BLE functions
 
@@ -219,19 +351,21 @@ bool getUserInput(char buffer[], uint8_t maxSize)
 }
 
 void sendBleMsg(char inputs[]) {
-	ble.print("AT+BLEUARTTX=");
-	ble.println(inputs);
+	//TODO: undo commenting these out
 
-	// check response stastus
-	if (!ble.waitForOK()) {
-		Serial.println(F("Failed to send?"));
-	}
+	//ble.print("AT+BLEUARTTX=");
+	//ble.println(inputs);
+
+	//// check response stastus
+	//if (!ble.waitForOK()) {
+	//	Serial.println(F("Failed to send?"));
+	//}
 }
 
 //END Adafruit BLE functions
 
 void setup() {
-	//Initialize Wire library
+    //Initialize Wire library
 	Wire.begin();
 
 	Serial.begin(115200);
@@ -270,10 +404,11 @@ void setup() {
 
 	ble.verbose(false);  // debug info is a little annoying after this point!
 
-						 /* Wait for connection */
-	while (!ble.isConnected()) {
-		delay(500);
-	}
+	/* Wait for connection */
+	//TODO: undo commenting these out
+	//while (!ble.isConnected()) {
+	//	delay(500);
+	//}
 
 	// LED Activity command is only supported from 0.6.6
 	if (ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION))
@@ -291,10 +426,14 @@ void setup() {
 	pinMode(ONBOARD_LED, OUTPUT);
 
 	// initialize digital pins 4-7 as inputs
-	pinMode(GREEN_BUTTON, INPUT);
-	pinMode(BLUE_BUTTON, INPUT);
-	pinMode(RED_BUTTON, INPUT);
-	pinMode(YELLOW_BUTTON, INPUT);
+	//pinMode(GREEN_BUTTON, INPUT);
+	//pinMode(BLUE_BUTTON, INPUT);
+	//pinMode(RED_BUTTON, INPUT);
+	//Now being used for power button
+	//pinMode(YELLOW_BUTTON, INPUT);
+	pinMode(POWER_BUTTON, INPUT);
+
+	pixels.begin();
 }
 
 // the loop function runs over and over again forever
@@ -331,6 +470,20 @@ void loop() {
 				if (address == JOYSTICK) {
 					joystick_found = true;
 					Serial.println("QWIIC joystick found.");
+				}
+
+				if (address == GPIO_BOARD) {
+					gpio_board_found = true;
+					Serial.println("QWIIC GPIO board found.");
+
+					setPinMode(GPIO_BOARD, 0, INPUT);
+					setPinMode(GPIO_BOARD, 1, INPUT);
+					setPinMode(GPIO_BOARD, 2, INPUT);
+					setPinMode(GPIO_BOARD, 3, INPUT);
+					setPinMode(GPIO_BOARD, 4, INPUT);
+					setPinMode(GPIO_BOARD, 5, INPUT);
+					setPinMode(GPIO_BOARD, 6, INPUT);
+					setPinMode(GPIO_BOARD, 7, INPUT);
 				}
 
 				nDevices++;
@@ -513,15 +666,112 @@ void loop() {
 		}
 	}
 
-	green_button_state = digitalRead(GREEN_BUTTON);
-	blue_button_state = digitalRead(BLUE_BUTTON);
-	red_button_state = digitalRead(RED_BUTTON);
-	yellow_button_state = digitalRead(YELLOW_BUTTON);
+	if (gpio_board_found) {
+
+		shift_button_state = readPin(GPIO_BOARD, 0);
+		if (shift_button_state != prev_shift_button_state) {
+			if (shift_button_state == HIGH) {
+				Serial.println("KEY Shift pressed.");
+				sendBleMsg("BH");
+			}
+			prev_shift_button_state = shift_button_state;
+		}
+
+		menu_button_state = readPin(GPIO_BOARD, 1);
+		if (menu_button_state != prev_menu_button_state) {
+			if (menu_button_state == HIGH) {
+				Serial.println("KEY Menu pressed.");
+				pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+				pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+				pixels.show();
+				sendBleMsg("BM");
+			}
+			prev_menu_button_state = menu_button_state;
+		}
+
+		up_button_state = readPin(GPIO_BOARD, 2);
+		if (up_button_state != prev_up_button_state) {
+			if (up_button_state == HIGH) {
+				Serial.println("KEY Up pressed.");
+				pixels.setPixelColor(0, pixels.Color(150, 0, 0));
+				pixels.show();
+				sendBleMsg("BU");
+			}
+			prev_up_button_state = up_button_state;
+		}
+
+		left_button_state = readPin(GPIO_BOARD, 3);
+		if (left_button_state != prev_left_button_state) {
+			if (left_button_state == HIGH) {
+				Serial.println("KEY Left pressed.");
+				pixels.setPixelColor(1, pixels.Color(0, 150, 0));
+				pixels.show();
+				sendBleMsg("BL");
+			}
+			prev_left_button_state = left_button_state;
+		}
+
+		enter_button_state = readPin(GPIO_BOARD, 4);
+		if (enter_button_state != prev_enter_button_state) {
+			if (enter_button_state == HIGH) {
+				Serial.println("KEY Enter pressed.");
+				sendBleMsg("BE");
+			}
+			prev_enter_button_state = enter_button_state;
+		}
+
+		right_button_state = readPin(GPIO_BOARD, 5);
+		if (right_button_state != prev_right_button_state) {
+			if (right_button_state == HIGH) {
+				Serial.println("KEY Right pressed.");
+				pixels.setPixelColor(1, pixels.Color(0, 0, 150));
+				pixels.show();
+				sendBleMsg("BR");
+			}
+			prev_right_button_state = right_button_state;
+		}
+
+		down_button_state = readPin(GPIO_BOARD, 6);
+		if (down_button_state != prev_down_button_state) {
+			if (down_button_state == HIGH) {
+				Serial.println("KEY Down pressed.");
+				pixels.setPixelColor(0, pixels.Color(150, 0, 150));
+				pixels.show();
+				sendBleMsg("BD");
+			}
+			prev_down_button_state = down_button_state;
+		}
+
+		backspace_button_state = readPin(GPIO_BOARD, 7);
+		if (backspace_button_state != prev_backspace_button_state) {
+			if (backspace_button_state == HIGH) {
+				Serial.println("KEY Backspace pressed.");
+				sendBleMsg("BS");
+			}
+			prev_backspace_button_state = backspace_button_state;
+		}
+	}
+
+	power_button_state = digitalRead(POWER_BUTTON);
+	if (power_button_state != prev_power_button_state) {
+		if (power_button_state == HIGH) {
+			Serial.println("KEY Power pressed.");
+			sendBleMsg("BP");
+		}
+		prev_power_button_state = power_button_state;
+	}
+
+	//For some reason, getting phantom presses on colored buttons
+	//green_button_state = digitalRead(GREEN_BUTTON);
+	//blue_button_state = digitalRead(BLUE_BUTTON);
+	//red_button_state = digitalRead(RED_BUTTON);
+	//Now being used for power button, instead of yellow
+	//yellow_button_state = digitalRead(YELLOW_BUTTON);
 
 	if (green_button_state != prev_green_button_state) {
 		if (green_button_state == HIGH) {
 			Serial.println("GREEN button pressed.");
-			sendBleMsg("BG");
+			//sendBleMsg("BG");
 		}
 		prev_green_button_state = green_button_state;
 	}
@@ -529,7 +779,7 @@ void loop() {
 	if (blue_button_state != prev_blue_button_state) {
 		if (blue_button_state == HIGH) {
 			Serial.println("BLUE button pressed.");
-			sendBleMsg("BB");
+			//sendBleMsg("BB");
 		}
 		prev_blue_button_state = blue_button_state;
 	}
@@ -537,7 +787,7 @@ void loop() {
 	if (red_button_state != prev_red_button_state) {
 		if (red_button_state == HIGH) {
 			Serial.println("RED button pressed.");
-			sendBleMsg("BR");
+			//sendBleMsg("BR");
 		}
 		prev_red_button_state = red_button_state;
 	}
@@ -545,7 +795,7 @@ void loop() {
 	if (yellow_button_state != prev_yellow_button_state) {
 		if (yellow_button_state == HIGH) {
 			Serial.println("YELLOW button pressed.");
-			sendBleMsg("BY");
+			//sendBleMsg("BY");
 		}
 		prev_yellow_button_state = yellow_button_state;
 	}
