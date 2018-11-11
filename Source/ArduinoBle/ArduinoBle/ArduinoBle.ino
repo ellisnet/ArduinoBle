@@ -50,7 +50,7 @@ limitations under the License.
 #define KEYPAD 0x06
 #define GPIO_BOARD 0x27
 
-#define NEOPIXEL_PIN 9
+#define NEOPIXEL_PIN 6
 #define NEOPIXEL_LED_COUNT 2
 
 const int ONBOARD_LED = 13;
@@ -60,7 +60,7 @@ const int BLUE_BUTTON = 3;
 const int RED_BUTTON = 5;
 const int YELLOW_BUTTON = 6;
 
-const int POWER_BUTTON = 6;
+const int POWER_BUTTON = 10;
 
 const byte KEY_STAR = 0x2A;
 const byte KEY_HASH = 0x23;
@@ -351,15 +351,13 @@ bool getUserInput(char buffer[], uint8_t maxSize)
 }
 
 void sendBleMsg(char inputs[]) {
-	//TODO: undo commenting these out
+	ble.print("AT+BLEUARTTX=");
+	ble.println(inputs);
 
-	//ble.print("AT+BLEUARTTX=");
-	//ble.println(inputs);
-
-	//// check response stastus
-	//if (!ble.waitForOK()) {
-	//	Serial.println(F("Failed to send?"));
-	//}
+	// check response stastus
+	if (!ble.waitForOK()) {
+		Serial.println(F("Failed to send?"));
+	}
 }
 
 //END Adafruit BLE functions
@@ -405,10 +403,9 @@ void setup() {
 	ble.verbose(false);  // debug info is a little annoying after this point!
 
 	/* Wait for connection */
-	//TODO: undo commenting these out
-	//while (!ble.isConnected()) {
-	//	delay(500);
-	//}
+	while (!ble.isConnected()) {
+		delay(500);
+	}
 
 	// LED Activity command is only supported from 0.6.6
 	if (ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION))
@@ -434,6 +431,10 @@ void setup() {
 	pinMode(POWER_BUTTON, INPUT);
 
 	pixels.begin();
+
+	//pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+	//pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+	//pixels.show();
 }
 
 // the loop function runs over and over again forever
@@ -565,6 +566,7 @@ void loop() {
 		}
 	}
 
+	/*
 	if (joystick_found) {
 		if (getJoystickButton() == JOY_BUTTON_DOWN) {
 			if (!prev_joystick_button_state) {
@@ -665,6 +667,7 @@ void loop() {
 			prev_joystick_direction = joystick_direction;
 		}
 	}
+	*/
 
 	if (gpio_board_found) {
 
@@ -681,9 +684,6 @@ void loop() {
 		if (menu_button_state != prev_menu_button_state) {
 			if (menu_button_state == HIGH) {
 				Serial.println("KEY Menu pressed.");
-				pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-				pixels.setPixelColor(1, pixels.Color(0, 0, 0));
-				pixels.show();
 				sendBleMsg("BM");
 			}
 			prev_menu_button_state = menu_button_state;
@@ -693,8 +693,6 @@ void loop() {
 		if (up_button_state != prev_up_button_state) {
 			if (up_button_state == HIGH) {
 				Serial.println("KEY Up pressed.");
-				pixels.setPixelColor(0, pixels.Color(150, 0, 0));
-				pixels.show();
 				sendBleMsg("BU");
 			}
 			prev_up_button_state = up_button_state;
@@ -704,8 +702,6 @@ void loop() {
 		if (left_button_state != prev_left_button_state) {
 			if (left_button_state == HIGH) {
 				Serial.println("KEY Left pressed.");
-				pixels.setPixelColor(1, pixels.Color(0, 150, 0));
-				pixels.show();
 				sendBleMsg("BL");
 			}
 			prev_left_button_state = left_button_state;
@@ -724,8 +720,6 @@ void loop() {
 		if (right_button_state != prev_right_button_state) {
 			if (right_button_state == HIGH) {
 				Serial.println("KEY Right pressed.");
-				pixels.setPixelColor(1, pixels.Color(0, 0, 150));
-				pixels.show();
 				sendBleMsg("BR");
 			}
 			prev_right_button_state = right_button_state;
@@ -735,8 +729,6 @@ void loop() {
 		if (down_button_state != prev_down_button_state) {
 			if (down_button_state == HIGH) {
 				Serial.println("KEY Down pressed.");
-				pixels.setPixelColor(0, pixels.Color(150, 0, 150));
-				pixels.show();
 				sendBleMsg("BD");
 			}
 			prev_down_button_state = down_button_state;
@@ -767,6 +759,8 @@ void loop() {
 	//red_button_state = digitalRead(RED_BUTTON);
 	//Now being used for power button, instead of yellow
 	//yellow_button_state = digitalRead(YELLOW_BUTTON);
+	
+	/*
 
 	if (green_button_state != prev_green_button_state) {
 		if (green_button_state == HIGH) {
@@ -800,28 +794,60 @@ void loop() {
 		prev_yellow_button_state = yellow_button_state;
 	}
 
-/*
-	// Check for user input
-	char inputs[BUFSIZE + 1];
-
-	if (getUserInput(inputs, BUFSIZE))
-	{
-		// Send characters to Bluefruit
-		Serial.print("[Send] ");
-		Serial.println(inputs);
-
-		sendBleMsg(inputs);
-	}
+	*/
 
 	// Check for incoming characters from Bluefruit
 	ble.println("AT+BLEUARTRX");
 	ble.readline();
-	if (!(strcmp(ble.buffer, "OK") == 0)) {
-		// Some data was found, its in the buffer
-		Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
+	if (!(strcmp(ble.buffer, "OK") == 0))
+	{
+		if (ble.buffer[0] == 'L' & ble.buffer[1] == 'R') {
+			Serial.println("Left LED -> Red");
+			pixels.setPixelColor(0, pixels.Color(150, 0, 0));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'G') {
+			Serial.println("Left LED -> Green");
+			pixels.setPixelColor(0, pixels.Color(0, 150, 0));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'B') {
+			Serial.println("Left LED -> Blue");
+			pixels.setPixelColor(0, pixels.Color(0, 0, 150));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'O') {
+			Serial.println("Left LED -> Off");
+			pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'R') {
+			Serial.println("Right LED -> Red");
+			pixels.setPixelColor(1, pixels.Color(150, 0, 0));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'G') {
+			Serial.println("Right LED -> Green");
+			pixels.setPixelColor(1, pixels.Color(0, 150, 0));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'B') {
+			Serial.println("Right LED -> Blue");
+			pixels.setPixelColor(1, pixels.Color(0, 0, 150));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'O') {
+			Serial.println("Right LED -> Off");
+			pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+			pixels.show();
+		}
+		else {
+			// Some data was found, its in the buffer
+			Serial.print(F("[Recv] "));
+			Serial.println(ble.buffer);
+		}
 		ble.waitForOK();
 	}
-*/
 
 	delay(CYCLE_MILLISECONDS); //loop delay
 }

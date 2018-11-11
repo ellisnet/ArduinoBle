@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyboardLed.Android", "KeyboardLed\KeyboardLed.Android\KeyboardLed.Android.csproj", "{CDF17C0C-5D73-4310-93BD-FCF401F1919F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyboardLed", "KeyboardLed\KeyboardLed\KeyboardLed.csproj", "{B9533874-799A-49ED-BB07-D0F08AA59A63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeBrix", "CodeBrix", "{7E3595E8-CFDE-4080-A0AA-046BEBCD8D71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeBrix.Prism", "..\..\..\CodeBrix_private\Source\Prism\CodeBrix.Prism\CodeBrix.Prism.csproj", "{D9E273FB-F01E-4A12-B2BE-0CED01F65697}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeBrix.Prism.Android", "..\..\..\CodeBrix_private\Source\Prism\CodeBrix.Prism.Android\CodeBrix.Prism.Android.csproj", "{2328735B-D8EC-4449-B46B-50C0378CF8D4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeBrix.Prism.DryIoc", "..\..\..\CodeBrix_private\Source\Prism\CodeBrix.Prism.DryIoc\CodeBrix.Prism.DryIoc.csproj", "{571469AD-3C64-4823-8095-68ACBC9F5999}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDF17C0C-5D73-4310-93BD-FCF401F1919F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9533874-799A-49ED-BB07-D0F08AA59A63}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D9E273FB-F01E-4A12-B2BE-0CED01F65697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9E273FB-F01E-4A12-B2BE-0CED01F65697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9E273FB-F01E-4A12-B2BE-0CED01F65697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9E273FB-F01E-4A12-B2BE-0CED01F65697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2328735B-D8EC-4449-B46B-50C0378CF8D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2328735B-D8EC-4449-B46B-50C0378CF8D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2328735B-D8EC-4449-B46B-50C0378CF8D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2328735B-D8EC-4449-B46B-50C0378CF8D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{571469AD-3C64-4823-8095-68ACBC9F5999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{571469AD-3C64-4823-8095-68ACBC9F5999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{571469AD-3C64-4823-8095-68ACBC9F5999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{571469AD-3C64-4823-8095-68ACBC9F5999}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D9E273FB-F01E-4A12-B2BE-0CED01F65697} = {7E3595E8-CFDE-4080-A0AA-046BEBCD8D71}
+		{2328735B-D8EC-4449-B46B-50C0378CF8D4} = {7E3595E8-CFDE-4080-A0AA-046BEBCD8D71}
+		{571469AD-3C64-4823-8095-68ACBC9F5999} = {7E3595E8-CFDE-4080-A0AA-046BEBCD8D71}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83816B27-B704-4FAA-8CC8-10D22EB365F4}
+	EndGlobalSection
+EndGlobal

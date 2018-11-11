@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:KeyboardLed.Views"
+             xmlns:vm="clr-namespace:KeyboardLed.ViewModels"
+             BindingContext="{Binding Source={x:Static vm:DesignTimeViewModelLocator.MainPage}}"
+             x:Class="KeyboardLed.Views.MainPage">
+
+    <Grid Margin="20" RowSpacing="15" ColumnSpacing="15" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Button Grid.Row="0" Grid.Column="0" BackgroundColor="Red" TextColor="White" Text="Left Red"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftRedCommand}"></Button>
+
+        <Button Grid.Row="1" Grid.Column="0" BackgroundColor="Green" TextColor="White" Text="Left Green"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftGreenCommand}"></Button>
+
+        <Button Grid.Row="2" Grid.Column="0" BackgroundColor="Blue" TextColor="White" Text="Left Blue"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftBlueCommand}"></Button>
+
+        <Button Grid.Row="3" Grid.Column="0" BackgroundColor="Black" TextColor="White" Text="Left Off"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftOffCommand}"></Button>
+
+        <Button Grid.Row="0" Grid.Column="1" BackgroundColor="Red" TextColor="White" Text="Right Red"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightRedCommand}"></Button>
+
+        <Button Grid.Row="1" Grid.Column="1" BackgroundColor="Green" TextColor="White" Text="Right Green"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightGreenCommand}"></Button>
+
+        <Button Grid.Row="2" Grid.Column="1" BackgroundColor="Blue" TextColor="White" Text="Right Blue"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightBlueCommand}"></Button>
+
+        <Button Grid.Row="3" Grid.Column="1" BackgroundColor="Black" TextColor="White" Text="Right Off"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightOffCommand}"></Button>
+
+    </Grid>
+
+</ContentPage>
