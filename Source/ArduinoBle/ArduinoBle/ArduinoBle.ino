@@ -813,7 +813,12 @@ void loop() {
 		}
 		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'B') {
 			Serial.println("Left LED -> Blue");
-			pixels.setPixelColor(0, pixels.Color(0, 0, 150));
+			pixels.setPixelColor(0, pixels.Color(0, 0, 210));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'Y') {
+			Serial.println("Left LED -> Yellow");
+			pixels.setPixelColor(0, pixels.Color(120, 40, 0));
 			pixels.show();
 		}
 		else if (ble.buffer[0] == 'L' & ble.buffer[1] == 'O') {
@@ -833,7 +838,12 @@ void loop() {
 		}
 		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'B') {
 			Serial.println("Right LED -> Blue");
-			pixels.setPixelColor(1, pixels.Color(0, 0, 150));
+			pixels.setPixelColor(1, pixels.Color(0, 0, 210));
+			pixels.show();
+		}
+		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'Y') {
+			Serial.println("Right LED -> Yellow");
+			pixels.setPixelColor(1, pixels.Color(120, 40, 0));
 			pixels.show();
 		}
 		else if (ble.buffer[0] == 'R' & ble.buffer[1] == 'O') {

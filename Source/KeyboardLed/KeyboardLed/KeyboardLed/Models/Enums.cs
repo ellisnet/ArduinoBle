@@ -35,11 +35,13 @@
         LeftRed,
         LeftGreen,
         LeftBlue,
+        LeftYellow,
         LeftOff,
 
         RightRed,
         RightGreen,
         RightBlue,
+        RightYellow,
         RightOff,
     }
 }

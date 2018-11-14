@@ -267,7 +267,7 @@ namespace KeyboardLed.Droid.Services
                                 ShowToast("Status: Device successfully connected!");
                                 await adapter.StopScanningForDevicesAsync();
                                 await Task.Delay(3000);
-                                scanCompletionSource.SetResult(true);
+                                scanCompletionSource?.TrySetResult(true);
                             }
                         }
                     };
@@ -275,7 +275,7 @@ namespace KeyboardLed.Droid.Services
                     adapter.ScanTimeoutElapsed += (o, args) =>
                     {
                         Debug.WriteLine("Scan timed out.");
-                        scanCompletionSource.SetResult(false);
+                        scanCompletionSource?.TrySetResult(false);
                     };
 
                     adapter.ScanMode = ScanMode.Balanced;

@@ -152,6 +152,9 @@ namespace KeyboardLed.Models
                 case LedMessage.LeftBlue:
                     result = Encoding.ASCII.GetBytes("LB");
                     break;
+                case LedMessage.LeftYellow:
+                    result = Encoding.ASCII.GetBytes("LY");
+                    break;
                 case LedMessage.LeftOff:
                     result = Encoding.ASCII.GetBytes("LO");
                     break;
@@ -164,6 +167,9 @@ namespace KeyboardLed.Models
                     break;
                 case LedMessage.RightBlue:
                     result = Encoding.ASCII.GetBytes("RB");
+                    break;
+                case LedMessage.RightYellow:
+                    result = Encoding.ASCII.GetBytes("RY");
                     break;
                 case LedMessage.RightOff:
                     result = Encoding.ASCII.GetBytes("RO");

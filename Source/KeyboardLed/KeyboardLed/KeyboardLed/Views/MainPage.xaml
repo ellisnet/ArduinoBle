@@ -13,6 +13,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -29,7 +30,10 @@
         <Button Grid.Row="2" Grid.Column="0" BackgroundColor="Blue" TextColor="White" Text="Left Blue"
                 HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftBlueCommand}"></Button>
 
-        <Button Grid.Row="3" Grid.Column="0" BackgroundColor="Black" TextColor="White" Text="Left Off"
+        <Button Grid.Row="3" Grid.Column="0" BackgroundColor="Goldenrod" TextColor="White" Text="Left Yellow"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftYellowCommand}"></Button>
+
+        <Button Grid.Row="4" Grid.Column="0" BackgroundColor="Black" TextColor="White" Text="Left Off"
                 HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding LeftOffCommand}"></Button>
 
         <Button Grid.Row="0" Grid.Column="1" BackgroundColor="Red" TextColor="White" Text="Right Red"
@@ -41,7 +45,10 @@
         <Button Grid.Row="2" Grid.Column="1" BackgroundColor="Blue" TextColor="White" Text="Right Blue"
                 HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightBlueCommand}"></Button>
 
-        <Button Grid.Row="3" Grid.Column="1" BackgroundColor="Black" TextColor="White" Text="Right Off"
+        <Button Grid.Row="3" Grid.Column="1" BackgroundColor="Goldenrod" TextColor="White" Text="Right Yellow"
+                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightYellowCommand}"></Button>
+
+        <Button Grid.Row="4" Grid.Column="1" BackgroundColor="Black" TextColor="White" Text="Right Off"
                 HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Command="{Binding RightOffCommand}"></Button>
 
     </Grid>

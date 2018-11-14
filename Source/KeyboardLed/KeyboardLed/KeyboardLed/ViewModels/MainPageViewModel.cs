@@ -36,6 +36,12 @@ namespace KeyboardLed.ViewModels
             _keyboardService?.SendLedMessage(LedMessage.LeftBlue);
         });
 
+        private DelegateCommand _leftYellowCommand;
+        public DelegateCommand LeftYellowCommand => LazyCreateCommand(ref _leftYellowCommand, () =>
+        {
+            _keyboardService?.SendLedMessage(LedMessage.LeftYellow);
+        });
+
         private DelegateCommand _leftOffCommand;
         public DelegateCommand LeftOffCommand => LazyCreateCommand(ref _leftOffCommand, () =>
         {
@@ -58,6 +64,12 @@ namespace KeyboardLed.ViewModels
         public DelegateCommand RightBlueCommand => LazyCreateCommand(ref _rightBlueCommand, () =>
         {
             _keyboardService?.SendLedMessage(LedMessage.RightBlue);
+        });
+
+        private DelegateCommand _rightYellowCommand;
+        public DelegateCommand RightYellowCommand => LazyCreateCommand(ref _rightYellowCommand, () =>
+        {
+            _keyboardService?.SendLedMessage(LedMessage.RightYellow);
         });
 
         private DelegateCommand _rightOffCommand;
