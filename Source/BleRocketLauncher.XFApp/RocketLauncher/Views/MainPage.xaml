@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RocketLauncher.Views"
+             xmlns:vm="clr-namespace:RocketLauncher.ViewModels"
+             x:Class="RocketLauncher.Views.MainPage"
+             BindingContext="{Binding Source={x:Static vm:DesignTimeViewModelLocator.MainPage}}"
+             NavigationPage.BackButtonTitle="Back"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid Margin="20" RowSpacing="20" ColumnSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Button Grid.Row="0" Grid.Column="0" Margin="2" Text="Launch 1" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch1Command}"></Button>
+
+        <Button Grid.Row="0" Grid.Column="1" Margin="2" Text="Launch 2" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch2Command}"></Button>
+
+        <Button Grid.Row="1" Grid.Column="0" Margin="2" Text="Launch 3" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch3Command}"></Button>
+
+        <Button Grid.Row="1" Grid.Column="1" Margin="2" Text="Launch 4" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch4Command}"></Button>
+
+        <Button Grid.Row="2" Grid.Column="0" Margin="2" Text="Launch 5" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch5Command}"></Button>
+
+        <Button Grid.Row="2" Grid.Column="1" Margin="2" Text="Launch 6" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch6Command}"></Button>
+
+        <Button Grid.Row="3" Grid.Column="0" Margin="2" Text="Launch 7" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch7Command}"></Button>
+
+        <Button Grid.Row="3" Grid.Column="1" Margin="2" Text="Launch 8" TextColor="White" BackgroundColor="Blue"
+                Command="{Binding Launch8Command}"></Button>
+
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="2" Text="Launch All" 
+                TextColor="White" BackgroundColor="Red" Command="{Binding LaunchAllCommand}"></Button>
+
+    </Grid>
+
+</ContentPage>
