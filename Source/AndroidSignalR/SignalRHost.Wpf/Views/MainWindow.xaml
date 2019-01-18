@@ -1,0 +1,64 @@
+﻿<Window x:Class="SignalRHost.Wpf.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SignalRHost.Wpf.Views"
+        xmlns:vm="clr-namespace:SignalRHost.Wpf.ViewModels"
+        mc:Ignorable="d"
+        Title="Hardware Keyboard Emulator" Height="600" Width="400" MinHeight="600" MinWidth="400">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Button x:Name="UiLeftLed" Grid.Row="0" Grid.Column="0" Margin="20" Background="White"></Button>
+        <Button x:Name="UiRightLed" Grid.Row="0" Grid.Column="2" Margin="20" Background="White"></Button>
+
+        <Button Grid.Row="1" Grid.Column="0" Margin="6" Content="Power" Command="{Binding KeyPowerCommand}"></Button>
+        <Button Grid.Row="1" Grid.Column="1" Margin="6" Content="Up" Command="{Binding KeyUpCommand}"></Button>
+        <Button Grid.Row="1" Grid.Column="2" Margin="6" Content="Menu" Command="{Binding KeyMenuCommand}"></Button>
+
+        <Button Grid.Row="2" Grid.Column="0" Margin="6" Content="Left" Command="{Binding KeyLeftCommand}"></Button>
+        <Button Grid.Row="2" Grid.Column="1" Margin="6" Content="Enter" Command="{Binding KeyEnterCommand}"></Button>
+        <Button Grid.Row="2" Grid.Column="2" Margin="6" Content="Right" Command="{Binding KeyRightCommand}"></Button>
+
+        <Button Grid.Row="3" Grid.Column="0" Margin="6" Content="Shift" Command="{Binding KeyShiftCommand}"></Button>
+        <Button Grid.Row="3" Grid.Column="1" Margin="6" Content="Down" Command="{Binding KeyDownCommand}"></Button>
+        <Button Grid.Row="3" Grid.Column="2" Margin="6" Content="Back" Command="{Binding KeyBackCommand}"></Button>
+
+        <Button Grid.Row="5" Grid.Column="0" Margin="6" Content="7" Command="{Binding Key7Command}"></Button>
+        <Button Grid.Row="5" Grid.Column="1" Margin="6" Content="8" Command="{Binding Key8Command}"></Button>
+        <Button Grid.Row="5" Grid.Column="2" Margin="6" Content="9" Command="{Binding Key9Command}"></Button>
+
+        <Button Grid.Row="6" Grid.Column="0" Margin="6" Content="4" Command="{Binding Key4Command}"></Button>
+        <Button Grid.Row="6" Grid.Column="1" Margin="6" Content="5" Command="{Binding Key5Command}"></Button>
+        <Button Grid.Row="6" Grid.Column="2" Margin="6" Content="6" Command="{Binding Key6Command}"></Button>
+
+        <Button Grid.Row="7" Grid.Column="0" Margin="6" Content="3" Command="{Binding Key3Command}"></Button>
+        <Button Grid.Row="7" Grid.Column="1" Margin="6" Content="2" Command="{Binding Key2Command}"></Button>
+        <Button Grid.Row="7" Grid.Column="2" Margin="6" Content="1" Command="{Binding Key1Command}"></Button>
+
+        <Button Grid.Row="8" Grid.Column="0" Margin="6" Content="." Command="{Binding KeyDotCommand}"></Button>
+        <Button Grid.Row="8" Grid.Column="1" Margin="6" Content="0" Command="{Binding Key0Command}"></Button>
+        <Button Grid.Row="8" Grid.Column="2" Margin="6" Content="-" Command="{Binding KeyDashCommand}"></Button>
+    </Grid>
+</Window>
